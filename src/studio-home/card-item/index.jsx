@@ -35,7 +35,7 @@ const CardItem = ({
     courseCreatorStatus,
     rerunCreatorStatus,
   } = useSelector(getStudioHomeData);
-  const courseUrl = () => new URL(url, getConfig().STUDIO_BASE_URL);
+  const courseUrl = () => !isLibraries ? new URL(url, getConfig().STUDIO_BASE_URL) : new URL('/course-authoring'+url, window.location.origin);
   const subtitle = isLibraries ? `${org} / ${number}` : `${org} / ${number} / ${run}`;
   const readOnlyItem = !(lmsLink || rerunLink || url);
   const showActions = !(readOnlyItem || isLibraries);

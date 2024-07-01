@@ -24,8 +24,10 @@ import CreateNewCourseForm from './create-new-course-form';
 import messages from './messages';
 import { useStudioHome } from './hooks';
 import AlertMessage from '../generic/alert-message';
+import { useNavigate } from 'react-router';
 
 const StudioHome = ({ intl }) => {
+  const navigate = useNavigate();
   const isPaginationCoursesEnabled = getConfig().ENABLE_HOME_PAGE_COURSE_API_V2;
   const {
     isLoadingPage,
@@ -89,7 +91,8 @@ const StudioHome = ({ intl }) => {
         iconBefore={AddIcon}
         size="sm"
         disabled={showNewCourseContainer}
-        href={libraryHref}
+        // href={libraryHref}
+        onClick={() => navigate("/new_library")}
         data-testid="new-library-button"
       >
         {intl.formatMessage(messages.addNewLibraryBtnText)}
