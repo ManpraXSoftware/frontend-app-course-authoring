@@ -28,10 +28,10 @@ import { TaxonomyLayout, TaxonomyDetailPage, TaxonomyListPage } from './taxonomy
 import { ContentTagsDrawer } from './content-tags-drawer';
 import AccessibilityPage from './accessibility-page';
 import NewLibrary from './mx/new-library'
-import LibraryContents from './mx/library-contents';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import './index.scss';
+import LibraryAuthoringRoutes from './mx/library-authoring/LibraryAuthoringRoutes';
 
 const queryClient = new QueryClient();
 
@@ -55,7 +55,7 @@ const App = () => {
       <Route>
         <Route path="/home" element={<StudioHome />} />
         <Route path="/new_library" element={<NewLibrary />} />
-        <Route path="/library/:libraryId/" element={<LibraryContents />} />
+        <Route path="/library/:libraryId/*" element={<LibraryAuthoringRoutes />} />
         <Route path="/course/:courseId/*" element={<CourseAuthoringRoutes />} />
         <Route path="/course_rerun/:courseId" element={<CourseRerun />} />
         {getConfig().ENABLE_ACCESSIBILITY_PAGE === 'true' && (

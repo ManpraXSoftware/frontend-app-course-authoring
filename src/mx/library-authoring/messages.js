@@ -3,11 +3,11 @@ import { defineMessages } from '@edx/frontend-platform/i18n';
 const messages = defineMessages({
   headingTitle: {
     id: 'library-authoring.library-outline.headingTitle',
-    defaultMessage: 'Library Problems',
+    defaultMessage: '{title}',
   },
   headingSubtitle: {
     id: 'library-authoring.library-outline.subTitle',
-    defaultMessage: 'Content',
+    defaultMessage: 'Content Library',
   },
   alertSuccessTitle: {
     id: 'library-authoring.library-outline.reindex.alert.success.title',

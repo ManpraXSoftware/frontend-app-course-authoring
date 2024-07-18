@@ -8,7 +8,7 @@ import messages from "./messages";
 import { getConfig } from '@edx/frontend-platform';
 import { Helmet } from 'react-helmet';
 import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
-
+import PropTypes from 'prop-types';
 import {
     Button,
     Container,
@@ -17,15 +17,20 @@ import {
 } from '@openedx/paragon';
 import {
     Delete,
+    Download,
+    FileDownload,
+    ImportExport,
+    Upload,
 } from '@openedx/paragon/icons';
 import SubHeader from '../../generic/sub-header/SubHeader';
 import OutlineSideBar from '../../course-outline/outline-sidebar/OutlineSidebar';
 import { Link } from "react-router-dom";
 import AddComponentButton from "../../course-unit/add-component/add-component-btn";
 import { useNavigate } from 'react-router-dom';
-import TagsModal from "./tags-modal";
+import TagsSidebar from "./tags-modal";
+import ProblemCard from "./problem-card";
 
-const LibraryContents = (/** @type {any} */ _props) => {
+const LibraryContents = ({ setLoading }) => {
     const navigate = useNavigate();
     const client = getAuthenticatedHttpClient();
     const intl = useIntl();
@@ -60,7 +65,7 @@ const LibraryContents = (/** @type {any} */ _props) => {
 
     const getDeleteFunction = (blockId) => {
         return () => {
-            // setIsLoading(false)
+            setLoading(true);
             client.delete(`${getConfig().STUDIO_BASE_URL}/xblock/${blockId}`)
                 .then(res => {
                     const index = libraryData.blocks.indexOf(blockId);
@@ -71,18 +76,22 @@ const LibraryContents = (/** @type {any} */ _props) => {
 
                     }
                 })
-                .catch(e => console.log(e));
+                .catch(e => console.log(e)).finally(e => setLoading(false));
+
             // http://studio.local.edly.io:8001/xblock/
         }
     }
-    const addProblem = () => {
-        const data = { "category": "problem", "type": "problem", "parent_locator": `lib-block-v1:${libraryId.split(':')[1]}+type@library+block@library` }
-        client.post(`${getConfig().STUDIO_BASE_URL}/xblock/`, data).then(res => res.data).then(data => navigate(`/course/${libraryId}/editor/problem/${data.locator}`))
+    const getAddProblemFunction = (type) => {
+        return () => {
+            setLoading(true);
+            const data = { "category": "problem", "type": type, "parent_locator": `lib-block-v1:${libraryId.split(':')[1]}+type@library+block@library` }
+            client.post(`${getConfig().STUDIO_BASE_URL}/xblock/`, data).then(res => res.data).then(data => navigate(`/course/${libraryId}/editor/problem/${data.locator}`)).finally(e=>setLoading(false))
+        }
     }
     return (
         <>
             <Helmet>
-                <title>{getPageHeadTitle(libraryData.display_name, intl.formatMessage(messages.headingTitle))}</title>
+                <title>{getPageHeadTitle(libraryData.display_name, intl.formatMessage(messages.headingTitle, { title: libraryData.display_name }))}</title>
             </Helmet>
             <Container size="xl" className="px-4">
                 <section className="course-outline-container mb-4 mt-5">
@@ -115,20 +124,22 @@ const LibraryContents = (/** @type {any} */ _props) => {
                             />
                         ) : null}
                     </TransitionReplace> */}
+
                     <SubHeader
-                        title={intl.formatMessage(messages.headingTitle)}
+                        title={intl.formatMessage(messages.headingTitle, { title: libraryData.display_name })}
                         subtitle={intl.formatMessage(messages.headingSubtitle)}
-                    // headerActions={(
-                    //     <HeaderNavigations
-                    //         isReIndexShow={isReIndexShow}
-                    //         isSectionsExpanded={isSectionsExpanded}
-                    //         headerNavigationsActions={headerNavigationsActions}
-                    //         isDisabledReindexButton={isDisabledReindexButton}
-                    //         hasSections={Boolean(sectionsList.length)}
-                    //         courseActions={courseActions}
-                    //         errors={errors}
-                    //     />
-                    // )}
+                        headerActions={(
+                            <>
+                                <Button onClick={() => navigate(`/library/${libraryId}/import`)} >
+                                    <Download />
+                                    Import
+                                </Button>
+                                <Button>
+                                    <Upload />
+                                    Export
+                                </Button>
+                            </>
+                        )}
                     />
                     <Layout
                         lg={[{ span: 9 }, { span: 3 }]}
@@ -158,48 +169,21 @@ const LibraryContents = (/** @type {any} */ _props) => {
                                                             strategy={verticalListSortingStrategy}
                                                         > */}
                                                         {libraryData.blocks.map((blockId, index) => (
-                                                            <Card >
-                                                                <Card.Header actions={
-                                                                    <TagsModal objectId={blockId} client={client} org={libraryId.split(":")[1].split("+",1)}/>
-                                                                } />
-                                                                <Link to={`/course/${libraryId}/editor/problem/${blockId}`}>
-                                                                    {blockId}
-                                                                </Link>
-                                                                <Card.Footer >
-                                                                    <Button size="sm" onClick={getDeleteFunction(blockId)}>
-                                                                        <Delete />
-                                                                    </Button>
-                                                                </Card.Footer>
+                                                            // <Card >
+                                                            //     <Card.Header actions={
+                                                            //         <TagsSidebar objectId={blockId} client={client} org={libraryId.split(":")[1].split("+", 1)} />
+                                                            //     } />
+                                                            //     <Link to={`/course/${libraryId}/editor/problem/${blockId}`}>
+                                                            //         {blockId}
+                                                            //     </Link>
+                                                            //     <Card.Footer >
+                                                            //         <Button size="sm" onClick={getDeleteFunction(blockId)}>
+                                                            //             <Delete />
+                                                            //         </Button>
+                                                            //     </Card.Footer>
 
-                                                            </Card>
-                                                            // <ProblemCard
-                                                            //     key={unit.id}
-                                                            //     unit={unit}
-                                                            // libraryId={libraryId}
-                                                            // subsection={subsection}
-                                                            // section={section}
-                                                            // isSelfPaced={statusBarData.isSelfPaced}
-                                                            // isCustomRelativeDatesActive={isCustomRelativeDatesActive}
-                                                            // index={unitIndex}
-                                                            // getPossibleMoves={possibleUnitMoves(
-                                                            //     [...sections],
-                                                            //     sectionIndex,
-                                                            //     subsectionIndex,
-                                                            //     section,
-                                                            //     subsection,
-                                                            //     subsection.childInfo.children,
-                                                            // )}
-                                                            // savingStatus={savingStatus}
-                                                            // onOpenPublishModal={openPublishModal}
-                                                            // onOpenConfigureModal={openConfigureModal}
-                                                            // onOpenDeleteModal={openDeleteModal}
-                                                            // onEditSubmit={handleEditSubmit}
-                                                            // onDuplicateSubmit={handleDuplicateUnitSubmit}
-                                                            // getTitleLink={getUnitUrl}
-                                                            // onOrderChange={updateUnitOrderByIndex}
-                                                            // onCopyToClipboardClick={handleCopyToClipboardClick}
-                                                            // discussionsSettings={discussionsSettings}
-                                                            // />
+                                                            // </Card>
+                                                            <ProblemCard blockId={blockId} libraryId={libraryId} client={client} onDelete={getDeleteFunction(blockId)} />
                                                         ))}
                                                         {/* </SortableContext> */}
                                                         {/* {courseActions.childAddable && (
@@ -224,14 +208,18 @@ const LibraryContents = (/** @type {any} */ _props) => {
                                                 )}
                                             </div>
                                         )}
-                                        <AddComponentButton type="problem" displayName="Add Problem" onClick={addProblem} />
+                                        <div className="pt-4">
+                                            <Card>
+                                                <AddComponentButton type="problem" displayName="Add Problem" onClick={getAddProblemFunction("problem")} />
+                                            </Card>
+                                        </div>
                                     </section>
                                 </div>
                             </article>
                         </Layout.Element>
-                        <Layout.Element>
-                            <OutlineSideBar courseId={libraryData.library_id} />
-                        </Layout.Element>
+                        {/* <Layout.Element> */}
+                        {/* <OutlineSideBar courseId={libraryData.library_id} /> */}
+                        {/* </Layout.Element> */}
                     </Layout>
                     {/* <EnableHighlightsModal
                         isOpen={isEnableHighlightsModalOpen}
@@ -289,7 +277,8 @@ const LibraryContents = (/** @type {any} */ _props) => {
 
 
 LibraryContents.propTypes = {
-    intl: intlShape.isRequired,
+    // intl: intlShape.isRequired,
+    setLoading: PropTypes.func
 };
 
 export default injectIntl(LibraryContents);

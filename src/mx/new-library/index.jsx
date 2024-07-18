@@ -211,87 +211,87 @@ const NewLibrary = (props) => {
     navigate('/home');
   };
 
-  return (
+  /* return (
     <>
-      <Header isHiddenMainMenu />
-      <Container size="xl" className="p-4 mt-3">
-        <div className="create-or-rerun-course-form">
-          <TransitionReplace>
-            {showErrorBanner ? (
-              <AlertMessage
-                variant="danger"
-                icon={InfoIcon}
-                title={postErrors.errMsg}
-                aria-hidden="true"
-                aria-labelledby={intl.formatMessage(
-                  messages.alertErrorExistsAriaLabelledBy,
-                )}
-                aria-describedby={intl.formatMessage(
-                  messages.alertErrorExistsAriaDescribedBy,
-                )}
+      <Header isHiddenMainMenu /> */
+  // return <Container size="xl" className="p-4 mt-3">
+   return <div className="create-or-rerun-course-form p-4 mt-3">
+      <TransitionReplace>
+        {showErrorBanner ? (
+          <AlertMessage
+            variant="danger"
+            icon={InfoIcon}
+            title={postErrors.errMsg}
+            aria-hidden="true"
+            aria-labelledby={intl.formatMessage(
+              messages.alertErrorExistsAriaLabelledBy,
+            )}
+            aria-describedby={intl.formatMessage(
+              messages.alertErrorExistsAriaDescribedBy,
+            )}
+          />
+        ) : null}
+      </TransitionReplace>
+      <h3 className="mb-3">{title}</h3>
+      <Form>
+        {newLibraryFields.map((field) => (
+          <Form.Group
+            className={classNames('form-group-custom', {
+              'form-group-custom_isInvalid': hasErrorField(field.name),
+            })}
+            key={field.label}
+          >
+            <Form.Label>{field.label}</Form.Label>
+            {field.name !== 'org' ? (
+              <Form.Control
+                value={field.value}
+                placeholder={field.placeholder}
+                name={field.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                isInvalid={hasErrorField(field.name)}
+                disabled={field.disabled}
+                ref={field?.ref}
               />
-            ) : null}
-          </TransitionReplace>
-          <h3 className="mb-3">{title}</h3>
-          <Form>
-            {newLibraryFields.map((field) => (
-              <Form.Group
-                className={classNames('form-group-custom', {
-                  'form-group-custom_isInvalid': hasErrorField(field.name),
-                })}
-                key={field.label}
+            ) : renderOrgField(field)}
+            <Form.Text>{field.helpText}</Form.Text>
+            {hasErrorField(field.name) && (
+              <Form.Control.Feedback
+                className="feedback-error"
+                type="invalid"
+                hasIcon={false}
               >
-                <Form.Label>{field.label}</Form.Label>
-                {field.name !== 'org' ? (
-                  <Form.Control
-                    value={field.value}
-                    placeholder={field.placeholder}
-                    name={field.name}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    isInvalid={hasErrorField(field.name)}
-                    disabled={field.disabled}
-                    ref={field?.ref}
-                  />
-                ) : renderOrgField(field)}
-                <Form.Text>{field.helpText}</Form.Text>
-                {hasErrorField(field.name) && (
-                  <Form.Control.Feedback
-                    className="feedback-error"
-                    type="invalid"
-                    hasIcon={false}
-                  >
-                    {errors[field.name]}
-                  </Form.Control.Feedback>
-                )}
-              </Form.Group>
-            ))}
-            <ActionRow className="justify-content-start">
-              <Button
-                variant="outline-primary"
-                onClick={handleOnClickCancel}
-              >
-                {intl.formatMessage(messages.cancelButton)}
-              </Button>
-              <StatefulButton
-                key="save-button"
-                className="ml-3"
-                onClick={handleOnClickCreate}
-                disabled={!isFormFilled || isFormInvalid}
-                state={
-                  savingStatus === RequestStatus.PENDING
-                    ? STATEFUL_BUTTON_STATES.pending
-                    : STATEFUL_BUTTON_STATES.default
-                }
-                {...createButtonState}
-              />
-            </ActionRow>
-          </Form>
-        </div>
-      </Container>
-      <StudioFooter />
-    </>
-  )
+                {errors[field.name]}
+              </Form.Control.Feedback>
+            )}
+          </Form.Group>
+        ))}
+        <ActionRow className="justify-content-start">
+          <Button
+            variant="outline-primary"
+            onClick={handleOnClickCancel}
+          >
+            {intl.formatMessage(messages.cancelButton)}
+          </Button>
+          <StatefulButton
+            key="save-button"
+            className="ml-3"
+            onClick={handleOnClickCreate}
+            disabled={!isFormFilled || isFormInvalid}
+            state={
+              savingStatus === RequestStatus.PENDING
+                ? STATEFUL_BUTTON_STATES.pending
+                : STATEFUL_BUTTON_STATES.default
+            }
+            {...createButtonState}
+          />
+        </ActionRow>
+      </Form>
+    </div>
+  // </Container>
+  /*  <StudioFooter />
+    </> 
+  ) */
 };
 
 NewLibrary.propTypes = {
