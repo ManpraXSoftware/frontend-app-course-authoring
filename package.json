@@ -94,6 +94,7 @@
     "regenerator-runtime": "0.13.7",
     "universal-cookie": "^4.0.4",
     "uuid": "^3.4.0",
+    "xslt-processor": "^3.0.1",
     "yup": "0.31.1"
   },
   "devDependencies": {

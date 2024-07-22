@@ -29,6 +29,7 @@ import AddComponentButton from "../../course-unit/add-component/add-component-bt
 import { useNavigate } from 'react-router-dom';
 import TagsSidebar from "./tags-modal";
 import ProblemCard from "./problem-card";
+import FiltersBar from "./filters-bar";
 
 const LibraryContents = ({ setLoading }) => {
     const navigate = useNavigate();
@@ -85,7 +86,7 @@ const LibraryContents = ({ setLoading }) => {
         return () => {
             setLoading(true);
             const data = { "category": "problem", "type": type, "parent_locator": `lib-block-v1:${libraryId.split(':')[1]}+type@library+block@library` }
-            client.post(`${getConfig().STUDIO_BASE_URL}/xblock/`, data).then(res => res.data).then(data => navigate(`/course/${libraryId}/editor/problem/${data.locator}`)).finally(e=>setLoading(false))
+            client.post(`${getConfig().STUDIO_BASE_URL}/xblock/`, data).then(res => res.data).then(data => navigate(`/course/${libraryId}/editor/problem/${data.locator}`)).finally(e => setLoading(false))
         }
     }
     return (
@@ -141,6 +142,9 @@ const LibraryContents = ({ setLoading }) => {
                             </>
                         )}
                     />
+
+                    <FiltersBar client={client} setLoading={setLoading}/>
+
                     <Layout
                         lg={[{ span: 9 }, { span: 3 }]}
                         md={[{ span: 9 }, { span: 3 }]}
@@ -160,7 +164,7 @@ const LibraryContents = ({ setLoading }) => {
                                             handleVideoSharingOptionChange={handleVideoSharingOptionChange}
                                         /> */}
                                         {!errors?.outlineIndexApi && (
-                                            <div className="pt-4">
+                                            <div className="pt-4" >
                                                 {libraryData.blocks ? (
                                                     <>
                                                         {/* <SortableContext

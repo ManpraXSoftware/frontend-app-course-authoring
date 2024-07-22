@@ -17,6 +17,7 @@ import CardHeader from '../../../course-outline/card-header/CardHeader';
 import TagsSidebar from '../tags-modal';
 import { getConfig } from '@edx/frontend-platform';
 import { Delete, Edit } from '@openedx/paragon/icons';
+import OLXParser from '../olx-parser';
 
 const ProblemCard = ({
   libraryId,
@@ -31,12 +32,12 @@ const ProblemCard = ({
     const fetchBlocks = async () => {
       const res = await client.get(`${getConfig().STUDIO_BASE_URL}/xblock/container/${blockId}`);
       // const problempreview = await client.get(`${getConfig().STUDIO_BASE_URL}/xblock/${blockId}`)
-      setBlockData(res.data);
+      await setBlockData(res.data);
     };
     fetchBlocks();
   }, []);
   return (
-    <Card >
+    <Card style={{ margin: "15px", padding: "15px" }}>
       <Card.Header actions={<ActionRow>
         <TagsSidebar objectId={blockId} client={client} org={libraryId.split(":")[1].split("+", 1)} />
         <Button size="sm" onClick={() => { navigate(`/course/${libraryId}/editor/problem/${blockId}`) }}>
@@ -44,8 +45,8 @@ const ProblemCard = ({
         </Button>
       </ActionRow>
       } />
-      {blockData?.display_name}
-      <iframe src={`${getConfig().STUDIO_BASE_URL}/xblock/${blockId}`} />
+      <h4> {blockData?.display_name}</h4>
+      <OLXParser olxContent={blockData?.data} />
       <Card.Footer >
         <Button size="sm" onClick={onDelete}>
           <Delete />
