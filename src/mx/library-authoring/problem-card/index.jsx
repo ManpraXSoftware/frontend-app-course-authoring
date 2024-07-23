@@ -40,7 +40,7 @@ const ProblemCard = ({
     <Card style={{ margin: "15px", padding: "15px" }}>
       <Card.Header actions={<ActionRow>
         <TagsSidebar objectId={blockId} client={client} org={libraryId.split(":")[1].split("+", 1)} />
-        <Button size="sm" onClick={() => { navigate(`/course/${libraryId}/editor/problem/${blockId}`) }}>
+        <Button size="sm" onClick={() => { navigate(`/library/${libraryId}/editor/problem/${blockId}`) }}>
           <Edit />
         </Button>
       </ActionRow>

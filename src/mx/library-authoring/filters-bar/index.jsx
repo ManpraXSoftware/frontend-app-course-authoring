@@ -96,7 +96,10 @@ const FiltersBar = ({ client, setLoading }) => {
                 fetchTags(t.complexities.id, { 0: (tags) => setAllTags(prev => ({ ...prev, complexities: tags })) }, t.complexities.depthThreshold);
             })
             .catch(e => console.log(e))
-            .finally(() => setLoading(false));
+            .finally(() => {
+                setLoading(false);
+                filterTags();
+            });
     }, [client, setLoading]);
 
     useEffect(() => {
