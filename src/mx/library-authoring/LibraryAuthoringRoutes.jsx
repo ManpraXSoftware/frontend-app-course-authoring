@@ -4,10 +4,11 @@ import {
 } from 'react-router-dom';
 import { PageWrap } from '@edx/frontend-platform/react';
 import LibraryAuthoringPage from './LibraryAuthoringPage';
-import LibraryContents from './';
+import LibraryContents from './LibraryContents';
 import LibraryImportPage from './import-page/LibraryImportPage';
 import Loading from 'CourseAuthoring/generic/Loading';
 import EditorContainer from './editors/EditorContainer';
+// import CourseExportPage from './export-page/CourseExportPage';
 
 /**
  * As of this writing, these routes are mounted at a path prefixed with the following:
@@ -48,6 +49,14 @@ const LibraryAuthoringRoutes = () => {
                         </PageWrap>
                     }
                 />
+                {/* <Route
+                    path="/"
+                    element={
+                        <PageWrap>
+                            <CourseExportPage setLoading={setLoading} />
+                        </PageWrap>
+                    }
+                /> */}
                 <Route
                     path="editor/:blockType/:blockId?"
                     element={<PageWrap><EditorContainer libraryId={libraryId} /></PageWrap>}

@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react';
 import { StatusBarItem } from './StatusBarItem';
 import { getConfig } from '@edx/frontend-platform';
 
-const FiltersBar = ({ client, setLoading }) => {
+const FiltersBar = ({ client, setLoading, taxonomies }) => {
     const [allTags, setAllTags] = useState({ subjects: [], strands: [], competencies: [], complexities: [] });
     const [filteredTags, setFilteredTags] = useState({ subjects: [], strands: [], competencies: [], complexities: [] });
-    const [taxonomies, setTaxonomies] = useState({ competencies: { id: 0, depthThreshold: 0 }, complexities: { id: 0, depthThreshold: 0 } });
+    // const [taxonomies, setTaxonomies] = useState({ competencies: { id: 0, depthThreshold: 0 }, complexities: { id: 0, depthThreshold: 0 } });
     const [selectedFilters, setSelectedFilters] = useState({
         subjects: '',
         strands: '',
@@ -76,31 +76,17 @@ const FiltersBar = ({ client, setLoading }) => {
     };
 
     useEffect(() => {
-        client.get(`${getConfig().STUDIO_BASE_URL}/api/content_tagging/v1/taxonomies/`)
-            .then(res => {
-                let t = { competencies: { id: 0, depthThreshold: 0 }, complexities: { id: 0, depthThreshold: 0 } };
-                res.data.results.forEach((v) => {
-                    if (v.name === "Competencies") {
-                        t.competencies.id = v.id;
-                        t.competencies.depthThreshold = v.tags_count;
-                    } else if (v.name === "Complexities") {
-                        t.complexities.id = v.id;
-                        t.complexities.depthThreshold = v.tags_count;
-                    }
-                });
-                setTaxonomies(t);
-                return t;
-            })
-            .then(t => {
-                fetchTags(t.competencies.id, { 0: (tags) => setAllTags(prev => ({ ...prev, subjects: tags })), 1: (tags) => setAllTags(prev => ({ ...prev, strands: tags })), 2: (tags) => setAllTags(prev => ({ ...prev, competencies: tags })) }, t.competencies.depthThreshold);
-                fetchTags(t.complexities.id, { 0: (tags) => setAllTags(prev => ({ ...prev, complexities: tags })) }, t.complexities.depthThreshold);
-            })
+
+        taxonomies && Promise.all([
+            fetchTags(taxonomies.competencies.id, { 0: (tags) => setAllTags(prev => ({ ...prev, subjects: tags })), 1: (tags) => setAllTags(prev => ({ ...prev, strands: tags })), 2: (tags) => setAllTags(prev => ({ ...prev, competencies: tags })) }, taxonomies.competencies.depthThreshold),
+            fetchTags(taxonomies.complexities.id, { 0: (tags) => setAllTags(prev => ({ ...prev, complexities: tags })) }, taxonomies.complexities.depthThreshold)
+        ])
             .catch(e => console.log(e))
             .finally(() => {
                 setLoading(false);
                 filterTags();
             });
-    }, [client, setLoading]);
+    }, [taxonomies]);
 
     useEffect(() => {
         filterTags();
