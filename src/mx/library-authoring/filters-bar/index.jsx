@@ -5,10 +5,9 @@ import { useEffect, useState } from 'react';
 import { StatusBarItem } from './StatusBarItem';
 import { getConfig } from '@edx/frontend-platform';
 
-const FiltersBar = ({ client, setLoading, taxonomies }) => {
+const FiltersBar = ({ client, taxonomies, onApply, libraryId }) => {
     const [allTags, setAllTags] = useState({ subjects: [], strands: [], competencies: [], complexities: [] });
     const [filteredTags, setFilteredTags] = useState({ subjects: [], strands: [], competencies: [], complexities: [] });
-    // const [taxonomies, setTaxonomies] = useState({ competencies: { id: 0, depthThreshold: 0 }, complexities: { id: 0, depthThreshold: 0 } });
     const [selectedFilters, setSelectedFilters] = useState({
         subjects: '',
         strands: '',
@@ -16,8 +15,8 @@ const FiltersBar = ({ client, setLoading, taxonomies }) => {
         complexities: ''
     });
 
-    const fetchTags = (taxonomyId, setTags, depthThreshold) => {
-        client.get(`${getConfig().STUDIO_BASE_URL}/api/content_tagging/v1/taxonomies/${taxonomyId}/tags/?full_depth_threshold=${depthThreshold}`)
+    const fetchTags = (taxonomyId, depthThreshold) => {
+        return client.get(`${getConfig().STUDIO_BASE_URL}/api/content_tagging/v1/taxonomies/${taxonomyId}/tags/?full_depth_threshold=${depthThreshold}`)
             .then((res) => {
                 const tagsByDepth = res.data.results.reduce((acc, tag) => {
                     if (!acc[tag.depth]) {
@@ -27,20 +26,19 @@ const FiltersBar = ({ client, setLoading, taxonomies }) => {
                     return acc;
                 }, {});
 
-                Object.keys(setTags).forEach(depth => {
-                    if (tagsByDepth[depth]) {
-                        setTags[depth](tagsByDepth[depth]);
-                    }
-                });
+                return tagsByDepth;
             })
-            .catch(e => console.log(e));
+            .catch(e => {
+                console.log(e);
+                return {};
+            });
     };
 
     const filterTags = () => {
         const filtered = {
             subjects: allTags.subjects,
-            strands: allTags.strands.filter(tag => selectedFilters.subjects === '' || tag.parent_value === selectedFilters.subjects),
-            competencies: allTags.competencies.filter(tag => selectedFilters.strands === '' || tag.parent_value === selectedFilters.strands),
+            strands: allTags.strands.filter(tag => tag.parent_value === selectedFilters.subjects),
+            competencies: allTags.competencies.filter(tag => tag.parent_value === selectedFilters.strands),
             complexities: allTags.complexities
         };
         setFilteredTags(filtered);
@@ -76,21 +74,37 @@ const FiltersBar = ({ client, setLoading, taxonomies }) => {
     };
 
     useEffect(() => {
-
-        taxonomies && Promise.all([
-            fetchTags(taxonomies.competencies.id, { 0: (tags) => setAllTags(prev => ({ ...prev, subjects: tags })), 1: (tags) => setAllTags(prev => ({ ...prev, strands: tags })), 2: (tags) => setAllTags(prev => ({ ...prev, competencies: tags })) }, taxonomies.competencies.depthThreshold),
-            fetchTags(taxonomies.complexities.id, { 0: (tags) => setAllTags(prev => ({ ...prev, complexities: tags })) }, taxonomies.complexities.depthThreshold)
-        ])
-            .catch(e => console.log(e))
-            .finally(() => {
-                setLoading(false);
-                filterTags();
-            });
+        if (taxonomies) {
+            Promise.all([
+                fetchTags(taxonomies.competencies.id, taxonomies.competencies.depthThreshold),
+                fetchTags(taxonomies.complexities.id, taxonomies.complexities.depthThreshold)
+            ])
+                .then(([competenciesTags, complexitiesTags]) => {
+                    setAllTags({
+                        subjects: competenciesTags[0] || [],
+                        strands: competenciesTags[1] || [],
+                        competencies: competenciesTags[2] || [],
+                        complexities: complexitiesTags[0] || []
+                    });
+                    filterTags();
+                })
+                .catch(e => console.log(e));
+        }
     }, [taxonomies]);
 
     useEffect(() => {
         filterTags();
-    }, [selectedFilters]);
+    }, [selectedFilters, allTags]);
+
+    const handleApplyFilters = () => {
+        const filters = {
+            subject: selectedFilters.subjects,
+            strand: selectedFilters.strands,
+            competency: selectedFilters.competencies,
+            complexity: selectedFilters.complexities
+        };
+        onApply(filters);
+    };
 
     return (
         <Stack direction="horizontal" gap={3.5} className="d-flex align-items-stretch outline-status-bar" data-testid="outline-status-bar">
@@ -147,7 +161,7 @@ const FiltersBar = ({ client, setLoading, taxonomies }) => {
                 </Dropdown>
             </StatusBarItem>
             <StatusBarItem>
-                <Button className="mb-3">Apply</Button>
+                <Button className="mb-3" onClick={handleApplyFilters}>Apply</Button>
             </StatusBarItem>
             <StatusBarItem>
                 <Button className="mb-3" onClick={handleClearFilters} disabled={!selectedFilters.subjects && !selectedFilters.strands && !selectedFilters.competencies && !selectedFilters.complexities}>

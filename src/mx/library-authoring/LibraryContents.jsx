@@ -46,7 +46,7 @@ const LibraryContents = ({ setLoading }) => {
     });
     const [showBlocks, setShowBlocks] = useState([]);
 
-    const outlineIndexApi = `${getConfig().STUDIO_BASE_URL}/library/${libraryId}?format=json`;
+    const outlineIndexApi = `${getConfig().STUDIO_BASE_URL}/api/library_content/${libraryId}`;
     useEffect(() => {
         client.get(`${getConfig().STUDIO_BASE_URL}/api/content_tagging/v1/taxonomies/`)
             .then(res => {
@@ -63,12 +63,17 @@ const LibraryContents = ({ setLoading }) => {
                 setTaxonomies(t);
             })
     }, [])
-    useEffect(() => {
+
+    const getOutlineIndex = (filters = {}) => {
         setIsLoading(true);
-        client.get(outlineIndexApi).then(res => res.data).then(data => {
+        client.get(outlineIndexApi, { params: filters }).then(res => res.data).then(data => {
             setLibraryData(data);
             setPage(1);
         }).finally(() => setIsLoading(false));
+    }
+
+    useEffect(() => {
+        getOutlineIndex()
     }, [outlineIndexApi, client]);
 
     useEffect(() => {
@@ -118,17 +123,17 @@ const LibraryContents = ({ setLoading }) => {
                 const response = await client.get(`${getConfig().STUDIO_BASE_URL}/api/export_library/${libraryId}`, {
                     responseType: 'blob', // Important: This ensures the response is treated as a blob
                 });
-    
+
                 // Create a URL for the blob object
                 const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }));
-    
+
                 // Create a link element and trigger the download
                 const link = document.createElement('a');
                 link.href = url;
                 document.body.appendChild(link);
                 link.click();
                 link.parentNode.removeChild(link);
-    
+
                 // Clean up the URL object
                 window.URL.revokeObjectURL(url);
             }
@@ -138,7 +143,7 @@ const LibraryContents = ({ setLoading }) => {
             setLoading(false);
         }
     };
-    
+
 
     return (
         <>
@@ -164,7 +169,7 @@ const LibraryContents = ({ setLoading }) => {
                         )}
                     />
 
-                    <FiltersBar taxonomies={taxonomies} client={client} setLoading={setLoading} />
+                    <FiltersBar taxonomies={taxonomies} client={client} libraryId={libraryId} onApply={getOutlineIndex} />
 
                     <Layout
                         lg={[{ span: 9 }, { span: 3 }]}
