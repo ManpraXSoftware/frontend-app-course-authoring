@@ -22,7 +22,7 @@ import messages from './i18n';
 import initializeStore from './store';
 import CourseAuthoringRoutes from './CourseAuthoringRoutes';
 import Head from './head/Head';
-import { StudioHome } from './studio-home';
+import { StudioHome } from './mx/studio-home';
 import CourseRerun from './course-rerun';
 import { TaxonomyLayout, TaxonomyDetailPage, TaxonomyListPage } from './taxonomy';
 import { ContentTagsDrawer } from './content-tags-drawer';

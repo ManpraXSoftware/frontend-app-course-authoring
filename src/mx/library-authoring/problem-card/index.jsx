@@ -49,10 +49,10 @@ const ProblemCard = ({
       <Card.Header
         title={blockData?.display_name}
         subtitle={
-          <Stack direction="horizontal" gap={2}>
+          <Stack direction="horizontal" style={{overflow:"hidden",flexWrap:"wrap"}} gap={2}>
             {tags.map(element => {
               if (element.taxonomyId === taxonomies.competencies.id) {
-                return element.tags[0].lineage.map(el => <Chip>
+                return element.tags[0].lineage.map(el => <Chip style={{flexWrap:"wrap"}}>
                   {el}
                 </Chip>)
               }

@@ -107,7 +107,7 @@ const FiltersBar = ({ client, taxonomies, onApply, libraryId }) => {
     };
 
     return (
-        <Stack direction="horizontal" gap={3.5} className="d-flex align-items-stretch outline-status-bar" data-testid="outline-status-bar">
+        <Stack direction="horizontal" gap={3.5} className="d-flex align-items-stretch outline-status-bar row" data-testid="outline-status-bar">
             <StatusBarItem title="Subjects">
                 <Dropdown className="mb-3" onSelect={handleSelect('subjects')}>
                     <Dropdown.Toggle id="dropdown-basic-1">
