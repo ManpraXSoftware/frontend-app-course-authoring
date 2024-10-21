@@ -106,7 +106,7 @@ const LibraryContents = ({ setLoading }) => {
             const data = { "category": "problem", "type": type, "parent_locator": `lib-block-v1:${libraryId.split(':')[1]}+type@library+block@library` };
             client.post(`${getConfig().STUDIO_BASE_URL}/xblock/`, data)
                 .then(res => res.data)
-                .then(data => navigate(`/course/${libraryId}/editor/problem/${data.locator}`))
+                .then(data => navigate(`/library/${libraryId}/editor/problem/${data.locator}`))
                 .finally(() => setLoading(false));
         }
     }
