@@ -35,6 +35,8 @@ const TabsSection = ({
   const preDefinedTabs = ['libraries', 'archived', 'taxonomies', 'courses', 'quizzes'];
   const [tabKey, setTabKey] = useState(TABS_LIST.courses);
   const [quizzes, setQuizzes] = useState([]);
+  const [quizzesCount, setQuizzesCount] = useState(0);
+  const [quizzesNumPages, setQuizzesNumPages] = useState(0);
   const {
     libraryAuthoringMfeUrl,
     redirectToLibraryAuthoringMfe,
@@ -55,6 +57,8 @@ const TabsSection = ({
     try {
       const { data } = await client.get(`${getConfig().STUDIO_BASE_URL}/api/courses`, { params: { content_type: 'quizzes' } });
       setQuizzes(camelCaseObject(data.results.courses));
+      setQuizzesCount(data.count);
+      setQuizzesNumPages(data.num_pages);
     } catch (error) {
       console.error('Failed to fetch quizzes data:', error);
     }
@@ -104,8 +108,8 @@ const TabsSection = ({
           isLoading={isLoadingCourses}
           isFailed={isFailedCoursesPage}
           dispatch={dispatch}
-          numPages={numPages}
-          coursesCount={coursesCount}
+          numPages={quizzesNumPages}
+          coursesCount={quizzesCount}
           isEnabledPagination={isPaginationCoursesEnabled}
         />
       </Tab>,
