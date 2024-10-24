@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
@@ -37,6 +37,8 @@ const CoursesTab = ({
   numPages,
   coursesCount,
   isEnabledPagination,
+  handlePageSelectedCustom,
+  pageCountCustom,
 }) => {
   const intl = useIntl();
   const location = useLocation();
@@ -53,7 +55,7 @@ const CoursesTab = ({
     COURSE_CREATOR_STATES.unrequested,
   ].includes(courseCreatorStatus);
   const locationValue = location.search ?? '';
-
+  const [customCurrentPage, setCustomCurrentPage] = useState(1);
   const handlePageSelected = (page) => {
     const {
       search,
@@ -154,15 +156,15 @@ const CoursesTab = ({
               ),
             )}
 
-            {numPages > 1 && isEnabledPagination && (
+            {(numPages > 1 && isEnabledPagination) || pageCountCustom ? (
               <Pagination
                 className="d-flex justify-content-center"
                 paginationLabel="pagination navigation"
-                pageCount={numPages}
-                currentPage={currentPage}
-                onPageSelect={handlePageSelected}
+                pageCount={pageCountCustom ? pageCountCustom : numPages}
+                currentPage={pageCountCustom ? customCurrentPage : currentPage}
+                onPageSelect={handlePageSelectedCustom ? (page) => { handlePageSelectedCustom(page); setCustomCurrentPage(page); } : handlePageSelected}
               />
-            )}
+            ) : null}
           </>
         ) : (!optimizationEnabled && isNotFilteringCourses && (
           <ContactAdministrator
@@ -225,6 +227,8 @@ CoursesTab.propTypes = {
   numPages: PropTypes.number,
   coursesCount: PropTypes.number,
   isEnabledPagination: PropTypes.bool,
+  handlePageSelectedCustom: PropTypes.func,
+  pageCountCustom: PropTypes.number,
 };
 
 export default CoursesTab;

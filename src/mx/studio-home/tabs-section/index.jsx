@@ -53,9 +53,9 @@ const TabsSection = ({
   const isLoadingLibraries = libraryLoadingStatus === RequestStatus.IN_PROGRESS;
   const isFailedLibrariesPage = libraryLoadingStatus === RequestStatus.FAILED;
 
-  const fetchQuizzesData = async () => {
+  const fetchQuizzesData = async (page = 1) => {
     try {
-      const { data } = await client.get(`${getConfig().STUDIO_BASE_URL}/api/courses`, { params: { content_type: 'quizzes' } });
+      const { data } = await client.get(`${getConfig().STUDIO_BASE_URL}/api/courses`, { params: { content_type: 'quizzes', page: page } });
       setQuizzes(camelCaseObject(data.results.courses));
       setQuizzesCount(data.count);
       setQuizzesNumPages(data.num_pages);
@@ -65,7 +65,7 @@ const TabsSection = ({
   };
 
   useEffect(() => {
-    fetchQuizzesData();
+    fetchQuizzesData(1);
   }, []);
 
   // Controlling the visibility of tabs when using conditional rendering is necessary for
@@ -111,6 +111,8 @@ const TabsSection = ({
           numPages={quizzesNumPages}
           coursesCount={quizzesCount}
           isEnabledPagination={isPaginationCoursesEnabled}
+          handlePageSelectedCustom={fetchQuizzesData}
+          pageCountCustom={quizzesNumPages}
         />
       </Tab>,
     );
