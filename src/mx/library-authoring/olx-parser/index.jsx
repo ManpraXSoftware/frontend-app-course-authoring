@@ -40,7 +40,7 @@ const OLXParser = ({ olxContent = "" }) => {
 
         <!-- Image processing -->
         <xsl:template match="img">
-            <img src="{@src}" alt="{@alt}" />
+            <img src="{@src}" alt="{@alt}" style="{@style}" />
         </xsl:template>
 
         <!-- Process choices (both types) -->
