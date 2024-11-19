@@ -37,10 +37,85 @@ const OLXParser = ({ olxContent = "" }) => {
                 <xsl:apply-templates select="*|text()" />
             </p>
         </xsl:template>
+        <!-- Recursive span -->
+        <xsl:template match="span">
+            <span>
+                <xsl:apply-templates select="*|text()" />
+            </span>
+        </xsl:template>
 
         <!-- Image processing -->
         <xsl:template match="img">
             <img src="{@src}" alt="{@alt}" style="{@style}" />
+        </xsl:template>
+        <!-- bold processing -->
+        <xsl:template match="strong">
+            <strong>
+                <xsl:apply-templates select="*|text()" />
+            </strong>
+        </xsl:template>
+
+        <!-- strong processing -->
+        <xsl:template match="strong">
+            <strong>
+                <xsl:apply-templates select="*|text()" />
+            </strong>
+        </xsl:template>
+
+        <!-- Italic processing -->
+        <xsl:template match="i">
+            <i>
+                <xsl:apply-templates select="*|text()" />
+            </i>
+        </xsl:template>
+
+        <!-- Emphasized processing -->
+        <xsl:template match="em">
+            <em>
+                <xsl:apply-templates select="*|text()" />
+            </em>
+        </xsl:template>
+
+        <!-- Marked processing -->
+        <xsl:template match="mark">
+            <mark>
+                <xsl:apply-templates select="*|text()" />
+            </mark>
+        </xsl:template>
+
+        <!-- Smaller processing -->
+        <xsl:template match="small">
+            <small>
+                <xsl:apply-templates select="*|text()" />
+            </small>
+        </xsl:template>
+
+        <!-- Deleted processing -->
+        <xsl:template match="del">
+            <del>
+                <xsl:apply-templates select="*|text()" />
+            </del>
+        </xsl:template>
+
+        <!-- Inserted processing -->
+        <xsl:template match="ins">
+            <ins>
+                <xsl:apply-templates select="*|text()" />
+            </ins>
+        </xsl:template>
+
+        <!-- Subscript processing -->
+        <xsl:template match="sub">
+            <sub>
+                <xsl:apply-templates select="*|text()" />
+            </sub>
+        </xsl:template>
+
+        <!-- Superscript processing -->
+        <xsl:template match="sup">
+            <sup>
+                <xsl:apply-templates select="*|text()" />
+            </sup>
         </xsl:template>
 
         <!-- Process choices (both types) -->
