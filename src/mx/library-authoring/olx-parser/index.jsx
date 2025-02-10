@@ -27,7 +27,7 @@ const OLXParser = ({ olxContent = "" }) => {
 
         <!-- Checkbox group -->
         <xsl:template match="choiceresponse">
-            <xsl:apply-templates select="p" />
+            <xsl:apply-templates select="*|text()" />
             <xsl:apply-templates select="checkboxgroup" />
         </xsl:template>
 
@@ -36,6 +36,12 @@ const OLXParser = ({ olxContent = "" }) => {
             <p>
                 <xsl:apply-templates select="*|text()" />
             </p>
+        </xsl:template>
+         <!-- Recursive div -->
+        <xsl:template match="div">
+            <div>
+                <xsl:apply-templates select="*|text()" />
+            </div>
         </xsl:template>
         <!-- Recursive span -->
         <xsl:template match="span">
