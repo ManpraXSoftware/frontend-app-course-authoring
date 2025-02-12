@@ -21,7 +21,7 @@ const OLXParser = ({ olxContent = "" }) => {
 
         <!-- Multiple choice -->
         <xsl:template match="multiplechoiceresponse">
-            <xsl:apply-templates select="p" />
+            <xsl:apply-templates select="*|text()" />
             <xsl:apply-templates select="choicegroup" />
         </xsl:template>
 
