@@ -30,6 +30,7 @@ const CoursesFilters = ({
     activeOnly,
     archivedOnly,
     cleanFilters,
+    content_type,
   } = studioHomeCoursesParams;
   const [inputSearchValue, setInputSearchValue] = useState('');
 
@@ -52,6 +53,7 @@ const CoursesFilters = ({
       archivedOnly,
       activeOnly,
       cleanFilters: false,
+      content_type: content_type,
     };
 
     const filterParams = getFilterTypeData(baseFilters);
@@ -76,6 +78,7 @@ const CoursesFilters = ({
       activeOnly,
       archivedOnly,
       order,
+      content_type,
     };
     const hasOnlySpaces = regexOnlyWhiteSpaces.test(searchValueDebounced);
 
@@ -95,7 +98,7 @@ const CoursesFilters = ({
 
   const handleSearchCoursesDebounced = useCallback(
     debounce((value) => handleSearchCourses(value), 400),
-    [],
+    [content_type],
   );
 
   return (

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Tab, Tabs } from '@openedx/paragon';
-import { getConfig, camelCaseObject } from '@edx/frontend-platform';
+import { getConfig } from '@edx/frontend-platform';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,7 +13,7 @@ import ArchivedTab from './archived-tab';
 import CoursesTab from './courses-tab';
 import { RequestStatus } from '../../../data/constants';
 import { fetchLibraryData } from '../data/thunks';
-import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
+import { updateStudioHomeCoursesCustomParams } from '../data/slice';
 
 const TabsSection = ({
   intl,
@@ -34,9 +34,6 @@ const TabsSection = ({
   });
   const preDefinedTabs = ['libraries', 'archived', 'taxonomies', 'courses', 'quizzes'];
   const [tabKey, setTabKey] = useState(TABS_LIST.courses);
-  const [quizzes, setQuizzes] = useState([]);
-  const [quizzesCount, setQuizzesCount] = useState(0);
-  const [quizzesNumPages, setQuizzesNumPages] = useState(0);
   const {
     libraryAuthoringMfeUrl,
     redirectToLibraryAuthoringMfe,
@@ -47,26 +44,10 @@ const TabsSection = ({
     courseLoadingStatus,
     libraryLoadingStatus,
   } = useSelector(getLoadingStatuses);
-  const client = getAuthenticatedHttpClient();
   const isLoadingCourses = courseLoadingStatus === RequestStatus.IN_PROGRESS;
   const isFailedCoursesPage = courseLoadingStatus === RequestStatus.FAILED;
   const isLoadingLibraries = libraryLoadingStatus === RequestStatus.IN_PROGRESS;
   const isFailedLibrariesPage = libraryLoadingStatus === RequestStatus.FAILED;
-
-  const fetchQuizzesData = async (page = 1) => {
-    try {
-      const { data } = await client.get(`${getConfig().STUDIO_BASE_URL}/api/courses`, { params: { content_type: 'quizzes', page: page } });
-      setQuizzes(camelCaseObject(data.results.courses));
-      setQuizzesCount(data.count);
-      setQuizzesNumPages(data.num_pages);
-    } catch (error) {
-      console.error('Failed to fetch quizzes data:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchQuizzesData(1);
-  }, []);
 
   // Controlling the visibility of tabs when using conditional rendering is necessary for
   // the correct operation of iterating over child elements inside the Paragon Tabs component.
@@ -101,18 +82,16 @@ const TabsSection = ({
         title={intl.formatMessage({ id: 'course-authoring.studio-home.quizzes.tab.title', defaultMessage: TABS_LIST.quizzes })}
       >
         <CoursesTab
-          coursesDataItems={quizzes}
+          coursesDataItems={courses}
           showNewCourseContainer={showNewCourseContainer}
           onClickNewCourse={onClickNewCourse}
           isShowProcessing={isShowProcessing}
           isLoading={isLoadingCourses}
           isFailed={isFailedCoursesPage}
           dispatch={dispatch}
-          numPages={quizzesNumPages}
-          coursesCount={quizzesCount}
+          numPages={numPages}
+          coursesCount={coursesCount}
           isEnabledPagination={isPaginationCoursesEnabled}
-          handlePageSelectedCustom={fetchQuizzesData}
-          pageCountCustom={quizzesNumPages}
         />
       </Tab>,
     );
@@ -187,7 +166,7 @@ const TabsSection = ({
     }
 
     return tabs;
-  }, [archivedCourses, librariesEnabled, showNewCourseContainer, isLoadingCourses, isLoadingLibraries, quizzes]);
+  }, [archivedCourses, librariesEnabled, showNewCourseContainer, isLoadingCourses, isLoadingLibraries]);
 
   const handleSelectTab = (tab) => {
     if (tab === TABS_LIST.libraries && redirectToLibraryAuthoringMfe) {
@@ -196,6 +175,19 @@ const TabsSection = ({
       dispatch(fetchLibraryData());
     } else if (tab === TABS_LIST.taxonomies) {
       navigate('/taxonomies');
+    } else if ([TABS_LIST.courses, TABS_LIST.quizzes].includes(tab)) {
+      const customParams = {
+        currentPage: 1,
+        search: undefined,
+        order: 'display_name',
+        isFiltered: true,
+        cleanFilters: false,
+        archivedOnly: undefined,
+        activeOnly: undefined,
+        content_type: tab,
+      };
+      dispatch(updateStudioHomeCoursesCustomParams(customParams));
+      //dispatch(fetchStudioHomeData(locationValue, false, { ...customParams }, true));
     }
     setTabKey(tab);
   };

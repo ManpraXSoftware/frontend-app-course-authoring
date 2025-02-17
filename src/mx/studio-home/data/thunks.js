@@ -37,7 +37,8 @@ function fetchStudioHomeData(search, hasHomeData, requestParams = {}, isPaginati
     }
     try {
       if (isPaginationEnabled) {
-        const coursesData = await getStudioHomeCoursesV2(search || '', requestParams);
+        const updatedRequestParams = { ...requestParams, content_type: requestParams?.content_type || 'courses' };
+        const coursesData = await getStudioHomeCoursesV2(search || '', updatedRequestParams);
         dispatch(fetchCourseDataSuccessV2(coursesData));
       } else {
         const coursesData = await getStudioHomeCourses(search || '');

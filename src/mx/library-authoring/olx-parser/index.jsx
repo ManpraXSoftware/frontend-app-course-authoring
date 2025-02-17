@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Xslt, XmlParser } from 'xslt-processor';
-import { Container, Form } from '@openedx/paragon';
+import { Container } from '@openedx/paragon';
 
 const OLXParser = ({ olxContent = "" }) => {
     const [htmlContent, setHtmlContent] = useState('');
@@ -55,13 +55,6 @@ const OLXParser = ({ olxContent = "" }) => {
             <img src="{@src}" alt="{@alt}" style="{@style}" />
         </xsl:template>
         <!-- bold processing -->
-        <xsl:template match="strong">
-            <strong>
-                <xsl:apply-templates select="*|text()" />
-            </strong>
-        </xsl:template>
-
-        <!-- strong processing -->
         <xsl:template match="strong">
             <strong>
                 <xsl:apply-templates select="*|text()" />
@@ -131,6 +124,13 @@ const OLXParser = ({ olxContent = "" }) => {
             </ul>
         </xsl:template>
 
+        <!-- Underline processing -->
+        <xsl:template match="u">
+            <u>
+                <xsl:apply-templates select="*|text()" />
+            </u>
+        </xsl:template>
+
         <!-- Handle choice rendering -->
         <xsl:template match="choice">
             <li>
@@ -166,38 +166,7 @@ const OLXParser = ({ olxContent = "" }) => {
     }, [olxContent]);
 
     // Convert HTML to React components
-    const renderHtmlContent = () => {
-        if (!htmlContent) {
-            return "";
-        }
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlContent, 'text/html');
-
-        const question = doc.querySelector('.question p');
-        const choices = doc.querySelectorAll('.question ul li');
-        return htmlContent
-        if (question && choices.length) {
-            return (
-                <Form.Group>
-                    <Form.Label>{question.innerHTML}</Form.Label>
-                    <Form.CheckboxSet>
-                        {Array.from(choices).map((choice, index) => (
-                            <Form.Checkbox
-                                value={choice.innerHTML}
-                                key={index}
-                            >
-                                {choice.innerHTML}
-                            </Form.Checkbox>
-                        ))}
-                    </Form.CheckboxSet>
-                </Form.Group>
-            );
-        }
-
-        return null;
-    };
-
+    
     return <Container>
         <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
     </Container>;

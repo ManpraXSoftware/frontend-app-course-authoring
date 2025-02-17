@@ -31,7 +31,7 @@ export async function getStudioHomeCourses(search) {
  */
 export async function getStudioHomeCoursesV2(search, customParams) {
   const customParamsFormat = snakeCaseObject(customParams);
-  const { data } = await getAuthenticatedHttpClient().get(`${getApiBaseUrl()}/api/courses${search}`, { params: { ...customParamsFormat, content_type: 'courses' } });
+  const { data } = await getAuthenticatedHttpClient().get(`${getApiBaseUrl()}/api/courses${search}`, { params: { ...customParamsFormat} });
   return camelCaseObject(data);
 }
 

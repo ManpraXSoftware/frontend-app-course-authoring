@@ -47,7 +47,7 @@ const CoursesTab = ({
     optimizationEnabled,
   } = useSelector(getStudioHomeData);
   const studioHomeCoursesParams = useSelector(getStudioHomeCoursesParams);
-  const { currentPage, isFiltered } = studioHomeCoursesParams;
+  const { currentPage, isFiltered, content_type } = studioHomeCoursesParams;
   const hasAbilityToCreateCourse = courseCreatorStatus === COURSE_CREATOR_STATES.granted;
   const showCollapsible = [
     COURSE_CREATOR_STATES.denied,
@@ -69,6 +69,7 @@ const CoursesTab = ({
       order,
       archivedOnly,
       activeOnly,
+      content_type,
     };
 
     dispatch(fetchStudioHomeData(locationValue, false, { page, ...customParams }, true));
@@ -84,11 +85,14 @@ const CoursesTab = ({
       cleanFilters: true,
       archivedOnly: undefined,
       activeOnly: undefined,
+      content_type: content_type
     };
 
-    dispatch(fetchStudioHomeData(locationValue, false, { page: 1, order: 'display_name' }, true));
+    dispatch(fetchStudioHomeData(locationValue, false, { page: 1, order: 'display_name', content_type:content_type }, true));
     dispatch(updateStudioHomeCoursesCustomParams(customParams));
   };
+
+  // useEffect(()=>dispatch(fetchStudioHomeData(locationValue, false, { page: 1, order: 'display_name', content_type:content_type }, true)),[])
 
   const isNotFilteringCourses = !isFiltered && !isLoading;
   const hasCourses = coursesDataItems?.length > 0;

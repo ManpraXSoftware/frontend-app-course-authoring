@@ -27,6 +27,7 @@ const slice = createSlice({
       activeOnly: undefined,
       isFiltered: false,
       cleanFilters: false,
+      content_type: 'courses',
     },
   },
   reducers: {
@@ -79,7 +80,7 @@ const slice = createSlice({
       state.studioHomeData.libraries = libraries;
     },
     updateStudioHomeCoursesCustomParams: (state, { payload }) => {
-      Object.assign(state.studioHomeCoursesRequestParams, payload);
+      Object.assign(state.studioHomeCoursesRequestParams, {...payload, content_type:payload.content_type? payload.content_type:state.studioHomeCoursesRequestParams.content_type});
     },
   },
 });
