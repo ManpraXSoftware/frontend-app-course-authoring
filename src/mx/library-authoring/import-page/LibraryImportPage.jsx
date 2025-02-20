@@ -28,15 +28,6 @@ const LibraryImportPage = ({ intl, libraryId, setLoading }) => {
   const anyRequestFailed = savingStatus === RequestStatus.FAILED || loadingStatus === RequestStatus.FAILED;
   const anyRequestInProgress = savingStatus === RequestStatus.PENDING || loadingStatus === RequestStatus.IN_PROGRESS;
   const setImportTriggered = (v) => { setLoading(v); _setImportTriggered(v) }
-  useEffect(() => {
-    // const cookieData = cookies.get(LAST_IMPORT_COOKIE_NAME);
-    // if (cookieData) {
-    //   dispatch(setSavingStatus(RequestStatus.SUCCESSFUL));
-    // setImportTriggered(true);
-    //   dispatch(setFileName(cookieData.fileName));
-    //   dispatch(setSuccessDate(cookieData.date));
-    // }
-  }, []);
 
   return (
     <>

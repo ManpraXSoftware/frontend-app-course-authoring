@@ -187,7 +187,6 @@ const TabsSection = ({
         content_type: tab,
       };
       dispatch(updateStudioHomeCoursesCustomParams(customParams));
-      //dispatch(fetchStudioHomeData(locationValue, false, { ...customParams }, true));
     }
     setTabKey(tab);
   };

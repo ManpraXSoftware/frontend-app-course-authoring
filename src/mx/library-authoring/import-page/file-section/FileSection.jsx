@@ -10,22 +10,25 @@ import { Card, Dropzone } from '@openedx/paragon';
 import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 import messages from './messages';
 import { useNavigate } from 'react-router';
-// import Loading from 'CourseAuthoring/generic/Loading';
+
+
+// Utility Functions
 const getApiBaseUrl = () => getConfig().STUDIO_BASE_URL;
-const getImportStatusApiUrl = (libraryId, fileName) => `${getApiBaseUrl()}/import_status/${libraryId}/${fileName}`;
+const getImportStatusApiUrl = (libraryId, fileName) => `${getApiBaseUrl()}/api/import_status/${libraryId}/${fileName}`;
 const postImportLibraryApiUrl = (libraryId) => `${getApiBaseUrl()}/api/import_library/${libraryId}`;
 
 const startLibraryImporting = async (libraryId, fileData, requestConfig, updateProgress) => {
 
   const chunkSize = 20 * 1000000; // 20 MB
   const fileSize = fileData.size || 0;
-  const chunkLength = Math.ceil(fileSize / chunkSize);
-  let resp;
-  const upload = async (blob, start, stop, index) => {
+  const chunkCount = Math.ceil(fileSize / chunkSize);
+  let response;
+
+  const uploadChunk = async (blob, start, stop, index) => {
+    try {
     const contentRange = `bytes ${start}-${stop}/${fileSize}`;
-    const contentDisposition = `attachment; filename="${fileData.name}"`;
     const headers = {
-      'Content-Disposition': contentDisposition,
+        'Content-Disposition': `attachment; filename="${fileData.name}"`,
     };
     const formData = new FormData();
     formData.append('library-data', blob, fileData.name);
@@ -35,33 +38,62 @@ const startLibraryImporting = async (libraryId, fileData, requestConfig, updateP
         formData,
         { headers, ...requestConfig },
       );
-    const percent = Math.trunc(((1 / chunkLength) * (index + 1)) * 100);
-    updateProgress(percent);
-    resp = camelCaseObject(data);
+      const progressPercent = Math.trunc(((index + 1) / chunkCount) * 100);
+      updateProgress(progressPercent);
+      response = camelCaseObject(data);
+    } catch (error) {
+      console.error('Error uploading chunk:', error);
+      throw new Error('Failed to upload a file chunk. Please try again.');
+    }
   };
 
-  const chunkUpload = async (file, index) => {
-    const start = index * chunkSize;
-    const stop = start + chunkSize < fileSize ? start + chunkSize : fileSize;
-    const blob = file.slice(start, stop, file.type);
-    await upload(blob, start, stop - 1, index);
-  };
-
-  /* eslint-disable no-await-in-loop */
-  for (let i = 0; i < chunkLength; i++) {
-    await chunkUpload(fileData, i);
+  for (let i = 0; i < chunkCount; i++) {
+    const start = i * chunkSize;
+    const stop = Math.min(start + chunkSize, fileSize);
+    const blob = fileData.slice(start, stop, fileData.type);
+    await uploadChunk(blob, start, stop - 1, i);
   }
 
-  return resp;
-}
+  return response;
+  };
 
+const pollImportStatus = async (libraryId, fileName, updateStage, resetState, navigate) => {
+  const pollInterval = 3000; // 3 seconds
+  const statusApiUrl = getImportStatusApiUrl(libraryId, fileName);
+
+  const checkStatus = async () => {
+    try {
+      const { data } = await getAuthenticatedHttpClient().get(statusApiUrl);
+      const { importStatus } = camelCaseObject(data);
+      updateStage(importStatus);
+      if (importStatus === 6) {
+        resetState(false)
+        navigate(`/library/${libraryId}`);
+      } else if (importStatus < 0) {
+        resetState()
+        throw new Error('Import failed. Please try again.');
+      } else {
+        setTimeout(checkStatus, pollInterval); // Continue polling
+      }
+    } catch (error) {
+      console.error('Polling failed:', error);
+      resetState();
+  }
+  };
+
+  checkStatus();
+};
+
+// Main Component
 const FileSection = ({ intl, libraryId, importTriggered, setImportTriggered }) => {
   const IMPORT_STAGES = {
     UPLOADING: 0,
-    UNPACKING: 1,
-    VERIFYING: 2,
-    UPDATING: 3,
-    SUCCESS: 4,
+    CONVERTING: 1,
+    UNPACKING: 2,
+    VERIFYING: 3,
+    UPDATING: 4,
+    TAGGING: 5,
+    SUCCESS: 6,
   };
   // const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
@@ -69,60 +101,42 @@ const FileSection = ({ intl, libraryId, importTriggered, setImportTriggered }) =
   const [fileName, setFileName] = useState("");
   const [currentStage, setCurrentStage] = useState("");
   const [hasError, setError] = useState(false);
-  const isShowedDropzone = !importTriggered || currentStage === IMPORT_STAGES.SUCCESS || hasError;
+  const isDropzoneVisible = !importTriggered || currentStage === IMPORT_STAGES.SUCCESS || hasError;
   const [progress, setProgress] = useState(0);
   const handleProcessUpload = async (libraryId, fileData, requestConfig, handleError) => {
     try {
-      // setLoading(true);
       const file = fileData.get('file');
-      // dispatch(reset());
-      // dispatch(updateSavingStatus(RequestStatus.PENDING));
       setFileName(file.name);
       setImportTriggered(true);
-      const { importStatus } = await startLibraryImporting(
+      const response = await startLibraryImporting(
         libraryId,
         file,
         requestConfig,
         (percent) => setProgress(percent),
       );
-      setCurrentStage(importStatus);
-      // setLoading(false);
-      // setImportCookie(moment().valueOf(), importStatus === IMPORT_STAGES.SUCCESS, file.name);
-      // dispatch(updateSavingStatus(RequestStatus.SUCCESSFUL));
-      setImportTriggered(false);
+
+      if (response.importStatus < 6) {
+        // Begin polling for import status
+        pollImportStatus(libraryId, file.name, setCurrentStage, resetState, navigate);
+      } else {
+        setCurrentStage(response.importStatus);
+        resetState(false)
       navigate(`/library/${libraryId}`);
-    } catch (error) {
-      handleError(error);
-      setImportTriggered(false);
-      setFileName("");
-      setCurrentStage("");
-      setError(true);
-      // setLoading(false);
-      // dispatch(updateSavingStatus(RequestStatus.FAILED));
-      return false;
-    }
-
-  }
-
-
-  () => {
-    return async (dispatch) => {
-      try {
-        const file = fileData.get('file');
-        setFileName(file.name);
-        const { importStatus } = await startLibraryImporting(
-          libraryId,
-          file,
-          requestConfig,
-          (percent) => setProgress(percent),
-        );
-        return true;
-      } catch (error) {
-        handleError(error);
-        return false;
       }
-    };
-  }
+    } catch (error) {
+      console.error('Upload failed:', error);
+      handleError(error);
+      resetState();
+    }
+  };
+
+  const resetState = (error=true) => {
+    setFileName('');
+    setCurrentStage('');
+    setError(error);
+    setProgress(0);
+    setImportTriggered(false);
+  };
 
   return (
     <Card>
@@ -132,7 +146,7 @@ const FileSection = ({ intl, libraryId, importTriggered, setImportTriggered }) =
         subtitle={fileName && intl.formatMessage(messages.fileChosen, { fileName })}
       />
       <Card.Section className="px-3 pt-2 pb-4">
-        {isShowedDropzone
+        {isDropzoneVisible 
           && (
             <Dropzone
               onProcessUpload={
@@ -150,7 +164,7 @@ const FileSection = ({ intl, libraryId, importTriggered, setImportTriggered }) =
 FileSection.propTypes = {
   intl: intlShape.isRequired,
   libraryId: PropTypes.string.isRequired,
-  importTriggered: PropTypes.func.isRequired,
+  importTriggered: PropTypes.bool.isRequired,
   setImportTriggered: PropTypes.func.isRequired,
 };
 
