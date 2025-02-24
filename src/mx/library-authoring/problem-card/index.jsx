@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { getConfig } from '@edx/frontend-platform';
 import { Delete, Edit } from '@openedx/paragon/icons';
 import TagsSidebar from '../tags-modal';
-import OLXParser from '../olx-parser';
+import OLXRenderer from '../olx-parser';
 import { getContentTaxonomyTagsData } from '../../../content-tags-drawer/data/api';
 
 const ProblemCard = ({
@@ -75,7 +75,7 @@ const ProblemCard = ({
           </ActionRow>
         }
       />
-      <OLXParser olxContent={blockData?.data} />
+      <OLXRenderer olxXml={blockData?.data} />
       <Card.Footer>
         <Button size="sm" onClick={onDelete}>
           <Delete />

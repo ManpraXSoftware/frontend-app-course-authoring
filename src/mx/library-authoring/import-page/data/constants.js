@@ -1,0 +1,10 @@
+export const LAST_LIBRARY_IMPORT_COOKIE_NAME = 'lastlibraryimport';
+export const IMPORT_STAGES = {
+  UPLOADING: 0,
+  CONVERTING: 1,
+  UNPACKING: 2,
+  VERIFYING: 3,
+  UPDATING: 4,
+  TAGGING:4,
+  SUCCESS: 6,
+};

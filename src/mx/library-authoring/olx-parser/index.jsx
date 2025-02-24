@@ -1,175 +1,66 @@
-import React, { useEffect, useState } from 'react';
-import { Xslt, XmlParser } from 'xslt-processor';
-import { Container } from '@openedx/paragon';
+import React, { useEffect, useState } from "react";
 
-const OLXParser = ({ olxContent = "" }) => {
-    const [htmlContent, setHtmlContent] = useState('');
-    const xslt = new Xslt();
-    const xmlParser = new XmlParser();
-
-    const xsltString = `
-    <?xml version="1.0" encoding="UTF-8"?>
-    <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-        <xsl:output method="html" indent="yes"/>
-        
-        <!-- Root template -->
-        <xsl:template match="/problem">
-            <div class="question">
-                <xsl:apply-templates select="multiplechoiceresponse | choiceresponse" />
-            </div>
-        </xsl:template>
-
-        <!-- Multiple choice -->
-        <xsl:template match="multiplechoiceresponse">
-            <xsl:apply-templates select="*|text()" />
-            <xsl:apply-templates select="choicegroup" />
-        </xsl:template>
-
-        <!-- Checkbox group -->
-        <xsl:template match="choiceresponse">
-            <xsl:apply-templates select="*|text()" />
-            <xsl:apply-templates select="checkboxgroup" />
-        </xsl:template>
-
-        <!-- Recursive p -->
-        <xsl:template match="p">
-            <p>
-                <xsl:apply-templates select="*|text()" />
-            </p>
-        </xsl:template>
-         <!-- Recursive div -->
-        <xsl:template match="div">
-            <div>
-                <xsl:apply-templates select="*|text()" />
-            </div>
-        </xsl:template>
-        <!-- Recursive span -->
-        <xsl:template match="span">
-            <span>
-                <xsl:apply-templates select="*|text()" />
-            </span>
-        </xsl:template>
-
-        <!-- Image processing -->
-        <xsl:template match="img">
-            <img src="{@src}" alt="{@alt}" style="{@style}" />
-        </xsl:template>
-        <!-- bold processing -->
-        <xsl:template match="strong">
-            <strong>
-                <xsl:apply-templates select="*|text()" />
-            </strong>
-        </xsl:template>
-
-        <!-- Italic processing -->
-        <xsl:template match="i">
-            <i>
-                <xsl:apply-templates select="*|text()" />
-            </i>
-        </xsl:template>
-
-        <!-- Emphasized processing -->
-        <xsl:template match="em">
-            <em>
-                <xsl:apply-templates select="*|text()" />
-            </em>
-        </xsl:template>
-
-        <!-- Marked processing -->
-        <xsl:template match="mark">
-            <mark>
-                <xsl:apply-templates select="*|text()" />
-            </mark>
-        </xsl:template>
-
-        <!-- Smaller processing -->
-        <xsl:template match="small">
-            <small>
-                <xsl:apply-templates select="*|text()" />
-            </small>
-        </xsl:template>
-
-        <!-- Deleted processing -->
-        <xsl:template match="del">
-            <del>
-                <xsl:apply-templates select="*|text()" />
-            </del>
-        </xsl:template>
-
-        <!-- Inserted processing -->
-        <xsl:template match="ins">
-            <ins>
-                <xsl:apply-templates select="*|text()" />
-            </ins>
-        </xsl:template>
-
-        <!-- Subscript processing -->
-        <xsl:template match="sub">
-            <sub>
-                <xsl:apply-templates select="*|text()" />
-            </sub>
-        </xsl:template>
-
-        <!-- Superscript processing -->
-        <xsl:template match="sup">
-            <sup>
-                <xsl:apply-templates select="*|text()" />
-            </sup>
-        </xsl:template>
-
-        <!-- Process choices (both types) -->
-        <xsl:template match="choicegroup | checkboxgroup">
-            <ul>
-                <xsl:apply-templates select="choice" />
-            </ul>
-        </xsl:template>
-
-        <!-- Underline processing -->
-        <xsl:template match="u">
-            <u>
-                <xsl:apply-templates select="*|text()" />
-            </u>
-        </xsl:template>
-
-        <!-- Handle choice rendering -->
-        <xsl:template match="choice">
-            <li>
-                <xsl:choose>
-                    <xsl:when test="@correct = 'true'">✔️</xsl:when>
-                    <xsl:otherwise>❌</xsl:otherwise>
-                </xsl:choose>
-                <xsl:value-of select="normalize-space(.)"/>
-            </li>
-        </xsl:template>
-
-        <!-- Text handling -->
-        <xsl:template match="text()">
-            <xsl:value-of select="normalize-space(.)"/>
-        </xsl:template>
-    </xsl:stylesheet>
-    `;
+const OLXRenderer = ({ olxXml }) => {
+    const [htmlContent, setHtmlContent] = useState("");
 
     useEffect(() => {
-        const parseAndTransform = async () => {
-            try {
-                const xmlDoc = xmlParser.xmlParse(olxContent);
-                const xsltDoc = xmlParser.xmlParse(xsltString);
+        if (!olxXml) return;
 
-                const output = await xslt.xsltProcess(xmlDoc, xsltDoc);
-                setHtmlContent(output);
-            } catch (e) {
-                console.error('Error:', e);
+        try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(olxXml, "text/xml");
+
+            // Look for multiplechoiceresponse or choiceresponse
+            const responseNode = xmlDoc.querySelector("multiplechoiceresponse, choiceresponse");
+            if (!responseNode) {
+                setHtmlContent("<p>No valid OLX content found</p>");
+                return;
             }
-        };
 
-        parseAndTransform();
-    }, [olxContent]);
+            // Determine choice group tag (choicegroup or checkboxgroup)
+            const choiceGroupTag = responseNode.querySelector("choicegroup, checkboxgroup");
+            if (!choiceGroupTag) {
+                setHtmlContent("<p>No choices found</p>");
+                return;
+            }
 
-    // Convert HTML to React components
-    
-    return <Container>
-        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-    </Container>;
+            // Extract the question text (everything before choicegroup/checkboxgroup)
+            let questionHtml = "";
+            responseNode.childNodes.forEach((node) => {
+                if (node !== choiceGroupTag && (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE)) {
+                    questionHtml += node.outerHTML || node.textContent;
+                }
+            });
+
+            // Extract choices
+            const choices = Array.from(choiceGroupTag.querySelectorAll("choice")).map((choice) => {
+                const isCorrect = choice.getAttribute("correct") === "true";
+                return `
+                    <li style="display: flex; align-items: center; font-size: 18px;">
+                        <span style="margin-right: 8px; color: ${isCorrect ? '#6c757d' : 'red'};">
+                            ${isCorrect ? '✔️' : '❌'}
+                        </span>
+                        ${choice.innerHTML.trim()}
+                    </li>
+                `;
+            }).join("");
+
+            // Combine question and choices into formatted HTML
+            const formattedHtml = `
+                <div>
+                    <div style="padding: 0 1.25rem;">${questionHtml}</div>
+                    <ul style="list-style-type: none;">${choices}</ul>
+                </div>
+            `;
+
+            setHtmlContent(formattedHtml);
+        } catch (error) {
+            console.error("Error parsing OLX XML:", error);
+            setHtmlContent("<p>Failed to load content</p>");
+        }
+    }, [olxXml]);
+
+    return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
 };
 
-export default OLXParser;
+export default OLXRenderer;

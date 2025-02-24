@@ -1,0 +1,68 @@
+.library-stepper {
+  .library-stepper__step {
+    display: flex;
+    gap: $spacer;
+    padding: 1.25rem 0;
+    opacity: .5;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $gray-200;
+    }
+
+    .library-stepper__step-icon {
+      position: relative;
+
+      & svg {
+        position: absolute;
+        top: .875rem;
+        left: 1.25rem;
+      }
+    }
+
+    .library-stepper__step-info {
+      margin-left: 1.875rem;
+    }
+
+    .library-stepper__step-title {
+      margin-bottom: .25rem;
+    }
+
+    .library-stepper__step-percent {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .library-stepper__step-description {
+      margin: 0;
+      font-size: 1rem;
+      color: $gray-400;
+    }
+  }
+
+  .library-stepper__step.active {
+    opacity: 1;
+
+    & svg {
+      animation: rotate 2s infinite linear;
+    }
+  }
+
+  .library-stepper__step.done {
+    opacity: 1;
+
+    & svg,
+    .library-stepper__step-title {
+      color: $success-500;
+    }
+  }
+
+  .library-stepper__step.error {
+    opacity: 1;
+
+    .library-stepper__step-title,
+    .library-stepper__step-description,
+    & svg {
+      color: $danger-300;
+    }
+  }
+}

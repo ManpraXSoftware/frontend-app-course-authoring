@@ -19,11 +19,11 @@ const messages = defineMessages({
   },
   description2: {
     id: 'library-authoring.import.description2',
-    defaultMessage: 'The library that you import must be in a .csv file. This file name must be "{libraryDisplayName}.csv".',
+    defaultMessage: 'The library that you import must be in a .csv file (that is, a .csv file with UTF-8 text).',
   },
   description3: {
     id: 'library-authoring.import.description3',
-    defaultMessage: 'The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the unpacking stage has completed. We recommend, however, that you don\'t make important changes to your library until the import operation has completed.',
+    defaultMessage: 'The import process has six stages. During the first three stages, you must stay on this page. You can leave this page after the unpacking stage has completed. We recommend, however, that you don\'t make important changes to your library until the import operation has completed.',
   },
 });
 

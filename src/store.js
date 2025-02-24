@@ -21,6 +21,7 @@ import { reducer as helpUrlsReducer } from './help-urls/data/slice';
 import { reducer as courseExportReducer } from './export-page/data/slice';
 import { reducer as genericReducer } from './generic/data/slice';
 import { reducer as courseImportReducer } from './import-page/data/slice';
+import { reducer as LibraryImportReducer } from './mx/library-authoring/import-page-new/data/slice';
 import { reducer as videosReducer } from './files-and-videos/videos-page/data/slice';
 import { reducer as courseOutlineReducer } from './course-outline/data/slice';
 import { reducer as courseUnitReducer } from './course-unit/data/slice';
@@ -51,6 +52,7 @@ export default function initializeStore(preloadedState = undefined) {
       courseExport: courseExportReducer,
       generic: genericReducer,
       courseImport: courseImportReducer,
+      libraryImport: LibraryImportReducer,
       videos: videosReducer,
       courseOutline: courseOutlineReducer,
       courseUnit: courseUnitReducer,
