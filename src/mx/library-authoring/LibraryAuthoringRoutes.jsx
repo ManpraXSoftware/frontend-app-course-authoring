@@ -8,7 +8,7 @@ import LibraryContents from './LibraryContents';
 import LibraryImportPage from './import-page/LibraryImportPage';
 import Loading from 'CourseAuthoring/generic/Loading';
 import EditorContainer from './editors/EditorContainer';
-// import CourseExportPage from './export-page/CourseExportPage';
+import LibraryExportPage from './export-page/LibraryExportPage';
 
 /**
  * As of this writing, these routes are mounted at a path prefixed with the following:
@@ -37,7 +37,7 @@ const LibraryAuthoringRoutes = () => {
                     path="import"
                     element={
                         <PageWrap>
-                            <LibraryImportPage libraryId={libraryId} setLoading={setLoading} />
+                            <LibraryImportPage libraryId={libraryId} />
                         </PageWrap>
                     }
                 />
@@ -49,14 +49,14 @@ const LibraryAuthoringRoutes = () => {
                         </PageWrap>
                     }
                 />
-                {/* <Route
-                    path="/"
+                <Route
+                    path="export"
                     element={
                         <PageWrap>
-                            <CourseExportPage setLoading={setLoading} />
+                            <LibraryExportPage libraryId={libraryId} />
                         </PageWrap>
                     }
-                /> */}
+                />
                 <Route
                     path="editor/:blockType/:blockId?"
                     element={<PageWrap><EditorContainer libraryId={libraryId} /></PageWrap>}

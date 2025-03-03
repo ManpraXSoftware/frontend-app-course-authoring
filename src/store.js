@@ -19,6 +19,7 @@ import { reducer as CourseUpdatesReducer } from './course-updates/data/slice';
 import { reducer as processingNotificationReducer } from './generic/processing-notification/data/slice';
 import { reducer as helpUrlsReducer } from './help-urls/data/slice';
 import { reducer as courseExportReducer } from './export-page/data/slice';
+import { reducer as libraryExportReducer } from './mx/library-authoring/export-page/data/slice';
 import { reducer as genericReducer } from './generic/data/slice';
 import { reducer as courseImportReducer } from './import-page/data/slice';
 import { reducer as LibraryImportReducer } from './mx/library-authoring/import-page/data/slice';
@@ -50,6 +51,7 @@ export default function initializeStore(preloadedState = undefined) {
       processingNotification: processingNotificationReducer,
       helpUrls: helpUrlsReducer,
       courseExport: courseExportReducer,
+      libraryExport: libraryExportReducer,
       generic: genericReducer,
       courseImport: courseImportReducer,
       libraryImport: LibraryImportReducer,

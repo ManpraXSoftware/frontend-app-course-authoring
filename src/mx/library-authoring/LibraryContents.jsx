@@ -161,7 +161,7 @@ const LibraryContents = ({ setLoading }) => {
                                     <Download />
                                     Import
                                 </Button>
-                                <Button onClick={exportFunction}>
+                                <Button onClick={() => navigate(`/library/${libraryId}/export`)}>
                                     <Upload />
                                     Export
                                 </Button>
