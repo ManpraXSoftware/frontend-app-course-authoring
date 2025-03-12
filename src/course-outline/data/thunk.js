@@ -279,11 +279,11 @@ export function configureCourseItemQuery(sectionId, configureFn) {
   };
 }
 
-export function configureCourseSectionQuery(sectionId, isVisibleToStaffOnly, startDatetime) {
+export function configureCourseSectionQuery(sectionId, isVisibleToStaffOnly, startDatetime, displayImage) {
   return async (dispatch) => {
     dispatch(configureCourseItemQuery(
       sectionId,
-      async () => configureCourseSection(sectionId, isVisibleToStaffOnly, startDatetime),
+      async () => configureCourseSection(sectionId, isVisibleToStaffOnly, startDatetime, displayImage),
     ));
   };
 }
@@ -307,6 +307,7 @@ export function configureCourseSubsectionQuery(
   prereqUsageKey,
   prereqMinScore,
   prereqMinCompletion,
+  displayImage
 ) {
   return async (dispatch) => {
     dispatch(configureCourseItemQuery(
@@ -329,16 +330,17 @@ export function configureCourseSubsectionQuery(
         prereqUsageKey,
         prereqMinScore,
         prereqMinCompletion,
+        displayImage,
       ),
     ));
   };
 }
 
-export function configureCourseUnitQuery(itemId, sectionId, isVisibleToStaffOnly, groupAccess) {
+export function configureCourseUnitQuery(itemId, sectionId, isVisibleToStaffOnly, groupAccess, displayImage) {
   return async (dispatch) => {
     dispatch(configureCourseItemQuery(
       sectionId,
-      async () => configureCourseUnit(itemId, isVisibleToStaffOnly, groupAccess),
+      async () => configureCourseUnit(itemId, isVisibleToStaffOnly, groupAccess, displayImage),
     ));
   };
 }

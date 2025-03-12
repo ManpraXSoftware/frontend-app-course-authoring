@@ -20,7 +20,7 @@ import BasicTab from './BasicTab';
 import VisibilityTab from './VisibilityTab';
 import AdvancedTab from './AdvancedTab';
 import UnitTab from './UnitTab';
-
+import CustomTab from './CustomTab'
 const ConfigureModal = ({
   isOpen,
   onClose,
@@ -32,6 +32,7 @@ const ConfigureModal = ({
   const intl = useIntl();
   const {
     displayName,
+    displayImage,
     start: sectionStartDate,
     visibilityState,
     due,
@@ -98,6 +99,7 @@ const ConfigureModal = ({
     // by default it is -1 i.e. accessible to all learners & staff
     selectedPartitionIndex: userPartitionInfo?.selectedPartitionIndex,
     selectedGroups: getSelectedGroups(),
+    displayImage: displayImage,
   };
 
   const validationSchema = Yup.object().shape({
@@ -139,7 +141,7 @@ const ConfigureModal = ({
     const groupAccess = {};
     switch (category) {
     case COURSE_BLOCK_NAMES.chapter.id:
-      onConfigureSubmit(data.isVisibleToStaffOnly, data.releaseDate);
+      onConfigureSubmit(data.isVisibleToStaffOnly, data.releaseDate, data.displayImage);
       break;
     case COURSE_BLOCK_NAMES.sequential.id:
       onConfigureSubmit(
@@ -159,9 +161,12 @@ const ConfigureModal = ({
         data.prereqUsageKey,
         data.prereqMinScore,
         data.prereqMinCompletion,
+        data.displayImage,
       );
       break;
     case COURSE_BLOCK_NAMES.vertical.id:
+      onConfigureSubmit(data.isVisibleToStaffOnly, groupAccess, data.displayImage);
+      break;
     case COURSE_BLOCK_NAMES.component.id:
       // groupAccess should be {partitionId: [group1, group2]} or {} if selectedPartitionIndex === -1
       if (data.selectedPartitionIndex >= 0) {
@@ -195,6 +200,13 @@ const ConfigureModal = ({
               category={category}
               isSubsection={isSubsection}
               showWarning={visibilityState === VisibilityTypes.STAFF_ONLY}
+            />
+          </Tab>
+          <Tab eventKey="custom" title={intl.formatMessage(messages.customTabTitle)}>
+            <CustomTab
+              values={values}
+              setFieldValue={setFieldValue}
+              category={category}
             />
           </Tab>
         </Tabs>
@@ -233,18 +245,44 @@ const ConfigureModal = ({
               onlineProctoringRules={onlineProctoringRules}
             />
           </Tab>
+            <Tab eventKey="custom" title={intl.formatMessage(messages.customTabTitle)}>
+              <CustomTab
+                values={values}
+                setFieldValue={setFieldValue}
+              />
+            </Tab>
+          </Tabs>
+        );
+      case COURSE_BLOCK_NAMES.vertical.id:
+        <Tabs>
+          <Tab eventKey="custom" title={intl.formatMessage(messages.customTabTitle)}>
+            <CustomTab
+              values={values}
+              setFieldValue={setFieldValue}
+              category={category}
+            />
+          </Tab>
         </Tabs>
-      );
-    case COURSE_BLOCK_NAMES.vertical.id:
     case COURSE_BLOCK_NAMES.component.id:
-      return (
-        <UnitTab
-          isXBlockComponent={COURSE_BLOCK_NAMES.component.id === category}
-          values={values}
-          setFieldValue={setFieldValue}
-          showWarning={visibilityState === VisibilityTypes.STAFF_ONLY && !ancestorHasStaffLock}
-          userPartitionInfo={userPartitionInfo}
-        />
+        return (
+          <Tabs>
+            <Tab eventKey="unit" title={intl.formatMessage(messages.unitTabTitle)}>
+              <UnitTab
+                isXBlockComponent={COURSE_BLOCK_NAMES.component.id === category}
+                values={values}
+                setFieldValue={setFieldValue}
+                showWarning={visibilityState === VisibilityTypes.STAFF_ONLY && !ancestorHasStaffLock}
+                userPartitionInfo={userPartitionInfo}
+              />
+            </Tab>
+            <Tab eventKey="custom" title={intl.formatMessage(messages.customTabTitle)}>
+              <CustomTab
+                values={values}
+                setFieldValue={setFieldValue}
+                category={category}
+              />
+            </Tab>
+          </Tabs>
       );
     default:
       return null;

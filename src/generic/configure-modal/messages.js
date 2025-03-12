@@ -275,6 +275,26 @@ const messages = defineMessages({
     id: 'course-authoring.course-outline.configure-modal.advanced-tab.reviewRulesDescriptionLinkText',
     defaultMessage: 'general proctored exam rules',
   },
+  unitTabTitle: {
+    id: 'course-authoring.course-outline.configure-modal.unit-tab.title',
+    defaultMessage: 'Unit',
+  },
+  customTabTitle: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.title',
+    defaultMessage: 'Custom',
+  },
+  customSectionTitle: {
+    id: 'course-authoring.course-outline.configure-modal.custom-section.title',
+    defaultMessage: '{visibilityTitle} Custom Display Image',
+  },
+  displayImageLabel: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.displayImageLabel',
+    defaultMessage: 'Display Image',
+  },
+  displayImageDescription: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.displayImageDescription',
+    defaultMessage: 'Display Image for this course block.',
+  },
 });
 
 export default messages;

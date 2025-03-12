@@ -222,9 +222,10 @@ export async function publishCourseSection(sectionId) {
  * @param {string} sectionId
  * @param {boolean} isVisibleToStaffOnly
  * @param {string} startDatetime
+ * @param {string} displayImage
  * @returns {Promise<Object>}
  */
-export async function configureCourseSection(sectionId, isVisibleToStaffOnly, startDatetime) {
+export async function configureCourseSection(sectionId, isVisibleToStaffOnly, startDatetime, displayImage) {
   const { data } = await getAuthenticatedHttpClient()
     .post(getCourseItemApiUrl(sectionId), {
       publish: 'republish',
@@ -232,6 +233,7 @@ export async function configureCourseSection(sectionId, isVisibleToStaffOnly, st
         // The backend expects metadata.visible_to_staff_only to either true or null
         visible_to_staff_only: isVisibleToStaffOnly ? true : null,
         start: startDatetime,
+        display_image: displayImage
       },
     });
 
@@ -257,6 +259,7 @@ export async function configureCourseSection(sectionId, isVisibleToStaffOnly, st
  * @param {string} prereqUsageKey,
  * @param {number} prereqMinScore,
  * @param {number} prereqMinCompletion,
+ * @param {string} displayImage,
  * @returns {Promise<Object>}
  */
 export async function configureCourseSubsection(
@@ -277,6 +280,7 @@ export async function configureCourseSubsection(
   prereqUsageKey,
   prereqMinScore,
   prereqMinCompletion,
+  displayImage,
 ) {
   const { data } = await getAuthenticatedHttpClient()
     .post(getCourseItemApiUrl(itemId), {
@@ -299,6 +303,7 @@ export async function configureCourseSubsection(
         default_time_limit_minutes: defaultTimeLimitMin,
         is_onboarding_exam: isOnboardingExam,
         start: releaseDate,
+        display_image: displayImage,
       },
     });
   return data;
@@ -309,9 +314,10 @@ export async function configureCourseSubsection(
  * @param {string} unitId
  * @param {boolean} isVisibleToStaffOnly
  * @param {object} groupAccess
+ * @param {string} displayImage
  * @returns {Promise<Object>}
  */
-export async function configureCourseUnit(unitId, isVisibleToStaffOnly, groupAccess) {
+export async function configureCourseUnit(unitId, isVisibleToStaffOnly, groupAccess, displayImage) {
   const { data } = await getAuthenticatedHttpClient()
     .post(getCourseItemApiUrl(unitId), {
       publish: 'republish',
@@ -319,6 +325,7 @@ export async function configureCourseUnit(unitId, isVisibleToStaffOnly, groupAcc
         // The backend expects metadata.visible_to_staff_only to either true or null
         visible_to_staff_only: isVisibleToStaffOnly ? true : null,
         group_access: groupAccess,
+        display_image: displayImage,
       },
     });
 
