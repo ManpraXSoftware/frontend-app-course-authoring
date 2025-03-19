@@ -25,6 +25,8 @@ import { reducer as courseImportReducer } from './import-page/data/slice';
 import { reducer as LibraryImportReducer } from './mx/library-authoring/import-page/data/slice';
 import { reducer as videosReducer } from './files-and-videos/videos-page/data/slice';
 import { reducer as courseOutlineReducer } from './course-outline/data/slice';
+import { reducer as appReducer} from '@edx/frontend-lib-content-components/dist/editors/data/redux/app/reducer'
+import { reducer as requestReducer} from '@edx/frontend-lib-content-components/dist/editors/data/redux/requests/reducer'
 import { reducer as courseUnitReducer } from './course-unit/data/slice';
 import { reducer as courseChecklistReducer } from './course-checklist/data/slice';
 import { reducer as accessibilityPageReducer } from './accessibility-page/data/slice';
@@ -57,6 +59,8 @@ export default function initializeStore(preloadedState = undefined) {
       libraryImport: LibraryImportReducer,
       videos: videosReducer,
       courseOutline: courseOutlineReducer,
+      app: appReducer,
+      requests: requestReducer,
       courseUnit: courseUnitReducer,
       courseChecklist: courseChecklistReducer,
       accessibilityPage: accessibilityPageReducer,
