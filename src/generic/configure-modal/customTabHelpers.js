@@ -81,7 +81,7 @@ export const fetchImages = ({ pageNumber, courseId, studioEndpointUrl }) => (dis
             dispatch(actions.app.setAssets({ images, imageCount }))
         },
         onFailure: (error) => {
-            dispatch(editorActions.requests.failRequest({
+            dispatch(actions.requests.failRequest({
                 requestKey: 'fetchAssets',
                 error,
             }))
@@ -92,7 +92,7 @@ export const fetchImages = ({ pageNumber, courseId, studioEndpointUrl }) => (dis
 
 export const initialize = (data) => (dispatch) => {
     // originalInitialize(data)
-    dispatch(editorActions.app.initialize(data));
+    dispatch(actions.app.initialize(data));
     dispatch(fetchImages({ pageNumber: 0, courseId: data.learningContextId, studioEndpointUrl: data.studioEndpointUrl }));
 };
 
