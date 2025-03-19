@@ -10,8 +10,7 @@ import { prepareEditorRef } from '@edx/frontend-lib-content-components'
 import * as helpers from './customTabHelpers'
 import { getConfig } from '@edx/frontend-platform';
 import { renderToStaticMarkup } from "react-dom/server";
-import { RequestKeys } from '@edx/frontend-lib-content-components/dist/editors/data/constants/requests';
-
+import { selectors } from '@edx/frontend-lib-content-components/dist/editors/data/redux'
 
 
 const CustomTab = (
