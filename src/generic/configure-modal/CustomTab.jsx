@@ -6,7 +6,6 @@ import messages from './messages';
 import { COURSE_BLOCK_NAMES } from '../../constants';
 import SelectImageModal from '@edx/frontend-lib-content-components/dist/editors/sharedComponents/ImageUploadModal/SelectImageModal';
 import { useDispatch, connect } from 'react-redux';
-import { prepareEditorRef } from '@edx/frontend-lib-content-components'
 import * as helpers from './customTabHelpers'
 import { getConfig } from '@edx/frontend-platform';
 import { renderToStaticMarkup } from "react-dom/server";
@@ -28,7 +27,6 @@ const CustomTab = (
   const dispatch = useDispatch();
   // const { imageSelectorRef, refReady, setImageSelectorRef } = helpers.prepareImageSelectorRef();
   const [courseId, setCourseId] = useState("");
-  const { editorRef, editorRefReady, setEditorRef } = prepareEditorRef();
 
   useEffect(() => {
     const match = window.location.pathname.match(/course-v1:([^+\/]+)\+([^+\/]+)\+([^+\/]+)/);

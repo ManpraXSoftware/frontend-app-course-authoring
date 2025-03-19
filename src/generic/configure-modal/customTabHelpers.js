@@ -3,7 +3,7 @@ import {
     useRef,
     useEffect,
 } from 'react';
-import { actions as editorActions } from '@edx/frontend-lib-content-components/dist/editors/data/redux';
+import { actions } from '@edx/frontend-lib-content-components/dist/editors/data/redux';
 import { RequestKeys } from '@edx/frontend-lib-content-components/dist/editors/data/constants/requests';
 import { loadImages } from '@edx/frontend-lib-content-components/dist/editors/data/services/cms/api';
 import { StrictDict } from '@edx/frontend-lib-content-components/dist/editors/utils';
