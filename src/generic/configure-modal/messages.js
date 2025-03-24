@@ -285,7 +285,7 @@ const messages = defineMessages({
   },
   customSectionTitle: {
     id: 'course-authoring.course-outline.configure-modal.custom-section.title',
-    defaultMessage: '{visibilityTitle} Custom Display Image',
+    defaultMessage: 'Custom Configurations',
   },
   displayImageLabel: {
     id: 'course-authoring.course-outline.configure-modal.custom-tab.displayImageLabel',
@@ -294,6 +294,18 @@ const messages = defineMessages({
   displayImageDescription: {
     id: 'course-authoring.course-outline.configure-modal.custom-tab.displayImageDescription',
     defaultMessage: 'Display Image for this course block.',
+  },
+  noDisplayImageSelectedMessage: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.noDisplayImageSelectedMessage',
+    defaultMessage: 'No Display Image Selected',
+  },
+  pickDisplayImageButton: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.button.pickImage',
+    defaultMessage: 'Pick Image',
+  },
+  clearDisplayImageButton: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.button.clear',
+    defaultMessage: 'Clear Image',
   },
 });
 

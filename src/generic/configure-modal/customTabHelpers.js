@@ -9,44 +9,48 @@ import { loadImages } from '@edx/frontend-lib-content-components/dist/editors/da
 import { StrictDict } from '@edx/frontend-lib-content-components/dist/editors/utils';
 import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 
+// Define a state dictionary using StrictDict
 export const state = StrictDict({
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+    // State for tracking image modal open/close status
     isImageModalOpen: (val) => useState(val),
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+    // State for storing selected image
     imageSelection: (val) => useState(val),
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+    // State for tracking if ref is ready
     refReady: (val) => useState(val),
 });
 
-
+// Function to handle network requests
 export const networkRequest = ({
     requestKey,
     promise,
     onSuccess,
     onFailure,
 }) => (dispatch) => {
-    dispatch(actions.requests.startRequest(requestKey));
+    dispatch(actions.requests.startRequest(requestKey)); // Start request
     return promise
         .then((response) => {
             if (onSuccess) {
                 onSuccess(response);
             }
-            dispatch(actions.requests.completeRequest({ requestKey, response }));
+            dispatch(actions.requests.completeRequest({ requestKey, response })); // Mark request as complete
         })
         .catch((error) => {
             if (onFailure) {
                 onFailure(error);
             }
-            dispatch(actions.requests.failRequest({ requestKey, error }));
+            dispatch(actions.requests.failRequest({ requestKey, error })); // Mark request as failed
         });
 };
 
+// Construct course assets URL
 export const courseAssetsUrl = ({ studioEndpointUrl, learningContextId }) => (
     `${studioEndpointUrl}/assets/${learningContextId}/`
 );
 
+// Fetch data using an authenticated HTTP client
 export const get = (...args) => getAuthenticatedHttpClient().get(...args);
 
+// API call to fetch images
 export const fetchImagesApi = ({ learningContextId, studioEndpointUrl, pageNumber }) => {
     const params = {
         asset_type: 'Images',
@@ -56,49 +60,53 @@ export const fetchImagesApi = ({ learningContextId, studioEndpointUrl, pageNumbe
         `${courseAssetsUrl({ studioEndpointUrl, learningContextId })}`,
         { params },
     );
-}
+};
 
-
+// Redux action to request fetching images
 export const fetchImagesRequest = ({ pageNumber, courseId, studioEndpointUrl, ...rest }) => (dispatch, getState) => {
     dispatch(networkRequest({
         requestKey: RequestKeys.fetchAssets,
         promise: fetchImagesApi({
             pageNumber,
             studioEndpointUrl: studioEndpointUrl,
-            learningContextId: courseId, //Course ID
+            learningContextId: courseId, // Course ID
         })
             .then(({ data }) => ({ images: loadImages(data.assets), imageCount: data.totalCount })),
         ...rest,
     }));
 };
 
+// Function to fetch images and dispatch results to Redux store
 export const fetchImages = ({ pageNumber, courseId, studioEndpointUrl }) => (dispatch) => {
     dispatch(fetchImagesRequest({
         pageNumber,
         courseId,
         studioEndpointUrl,
         onSuccess: ({ images, imageCount }) => {
-            dispatch(actions.app.setAssets({ images, imageCount }))
+            dispatch(actions.app.setAssets({ images, imageCount }));
         },
         onFailure: (error) => {
             dispatch(actions.requests.failRequest({
                 requestKey: 'fetchAssets',
                 error,
-            }))
+            }));
         },
     }));
-
 };
 
+// Initialize function to set up app state and fetch images
 export const initialize = (data) => (dispatch) => {
-    // originalInitialize(data)
-    dispatch(actions.app.initialize(data));
+    dispatch(actions.app.initialize(data)); // Initialize app state
     dispatch(fetchImages({ pageNumber: 0, courseId: data.learningContextId, studioEndpointUrl: data.studioEndpointUrl }));
 };
 
+// Convert a string to an HTML fragment
 export const stringToFragment = (htmlString) => document.createRange().createContextualFragment(htmlString);
+
+// Regular expression to match image asset strings
 export const imageMatchRegex = /asset-v1.(.*).type.(.*).block.(.*)/;
 
+// Compare two image asset strings by identifiers
 export const matchImageStringsByIdentifiers = (a, b) => {
     if (!a || !b || typeof a !== 'string' || typeof b !== 'string') return null;
     const matchA = JSON.stringify(a.match(imageMatchRegex)?.slice?.(1));
@@ -106,6 +114,7 @@ export const matchImageStringsByIdentifiers = (a, b) => {
     return matchA && matchA === matchB;
 };
 
+// Filter assets to include only image types
 export const filterAssets = ({ assets }) => {
     let images = [];
     const assetsList = Object.values(assets);
@@ -115,29 +124,29 @@ export const filterAssets = ({ assets }) => {
     return images;
 };
 
+// Extract an image element from an HTML string by its source URL
 export const getImageFromHtmlString = (htmlString, imageSrc) => {
     const images = stringToFragment(htmlString)?.querySelectorAll('img') || [];
-
     return Array.from(images).find((img) => matchImageStringsByIdentifiers(img.src || '', imageSrc));
 };
 
+// Populate a reference with images and their dimensions
 export const addImagesAndDimensionsToRef = ({ imagesRef, assets, editorContentHtml }) => {
     const imagesWithDimensions = filterAssets({ assets }).map((image) => {
         const imageFragment = getImageFromHtmlString(editorContentHtml, image.url);
         return { ...image, width: imageFragment?.width, height: imageFragment?.height };
     });
-
     imagesRef.current = imagesWithDimensions;
 };
 
+// Custom hook to manage images
 export const useImages = ({ assets, editorContentHtml }) => {
-    const imagesRef = useRef([]);
+    const imagesRef = useRef([]); // Create a ref for images
     useEffect(() => {
-        addImagesAndDimensionsToRef({ imagesRef, assets, editorContentHtml });
+        addImagesAndDimensionsToRef({ imagesRef, assets, editorContentHtml }); // Update ref on mount
     }, []);
 
-    const [refReady, setRefReady] = state.refReady(false);
-    useEffect(() => setRefReady(true), []);
+    const [refReady, setRefReady] = state.refReady(false); // Track readiness state
+    useEffect(() => setRefReady(true), []); // Set ready state after mount
     return { imagesRef, refReady };
 };
-

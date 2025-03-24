@@ -78,7 +78,7 @@ const CustomTab = (
   return (
     <Container fluid>
       <h5 className="mt-4 text-gray-700">
-        {intl.formatMessage(messages.customSectionTitle, { visibilityTitle })}
+        {intl.formatMessage(messages.customSectionTitle)}
       </h5>
       <hr />
       <Form.Group name="customConfigs" onChange={handleChange} value={displayImage}>
@@ -86,11 +86,15 @@ const CustomTab = (
           <FormattedMessage {...messages.displayImageLabel} />
         </Form.Label>
         <br />
-        <div dangerouslySetInnerHTML={{ __html: editorContentHtml }} />
+        {displayImage && <div dangerouslySetInnerHTML={{ __html: editorContentHtml }} />}
+        {!displayImage && <div>{intl.formatMessage(messages.noDisplayImageSelectedMessage)}</div>}
         <br /><br />
         <Form.Row>
           <Form.Control value={displayImage} readOnly={true} />
-          <Button onClick={openSelectImageModal}>Pick Image</Button>
+          <Stack gap={2} direction="horizontal">
+            <Button onClick={openSelectImageModal}>{intl.formatMessage(messages.pickDisplayImageButton)}</Button>
+            <Button onClick={clearDisplayImageModalSelection}>{intl.formatMessage(messages.clearDisplayImageButton)}</Button>
+          </Stack>
         </Form.Row>
         <Form.Text>
           <FormattedMessage {...messages.displayImageDescription} />
