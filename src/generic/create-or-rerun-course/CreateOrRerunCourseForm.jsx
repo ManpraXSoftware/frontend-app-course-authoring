@@ -29,6 +29,7 @@ const CreateOrRerunCourseForm = ({
   isCreateNewCourse,
   initialValues,
   onClickCancel,
+  content_type,
 }) => {
   const { courseId } = useParams();
   const savingStatus = useSelector(getSavingStatus);
@@ -142,7 +143,13 @@ const CreateOrRerunCourseForm = ({
 
   const handleOnClickCreate = () => {
     const courseData = isCreateNewCourse ? values : { ...values, sourceCourseKey: courseId };
-    dispatch(updateCreateOrRerunCourseQuery(courseData));
+    if (content_type){
+      const mxCourseData= {...courseData, content_type:content_type}
+      dispatch(updateCreateOrRerunCourseQuery(mxCourseData));
+    }
+    else{
+      dispatch(updateCreateOrRerunCourseQuery(courseData));
+    }
   };
 
   const handleOnClickCancel = () => {
@@ -279,6 +286,7 @@ const CreateOrRerunCourseForm = ({
 CreateOrRerunCourseForm.defaultProps = {
   title: '',
   isCreateNewCourse: false,
+  content_type: 'courses',
 };
 
 CreateOrRerunCourseForm.propTypes = {
@@ -291,6 +299,7 @@ CreateOrRerunCourseForm.propTypes = {
   }).isRequired,
   isCreateNewCourse: PropTypes.bool,
   onClickCancel: PropTypes.func.isRequired,
+  content_type: PropTypes.string,
 };
 
 export default CreateOrRerunCourseForm;

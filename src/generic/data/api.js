@@ -5,7 +5,7 @@ import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 import { convertObjectToSnakeCase } from '../../utils';
 
 export const getApiBaseUrl = () => getConfig().STUDIO_BASE_URL;
-export const getCreateOrRerunCourseUrl = () => new URL('course/', getApiBaseUrl()).href;
+export const getCreateOrRerunCourseUrl = () => new URL('api/course/', getApiBaseUrl()).href;
 export const getCourseRerunUrl = (courseId) => new URL(`/api/contentstore/v1/course_rerun/${courseId}`, getApiBaseUrl()).href;
 export const getOrganizationsUrl = () => new URL('organizations', getApiBaseUrl()).href;
 export const getClipboardUrl = () => `${getApiBaseUrl()}/api/content-staging/v1/clipboard/`;

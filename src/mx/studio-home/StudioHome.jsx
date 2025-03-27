@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Container,
@@ -44,7 +44,7 @@ const StudioHome = ({ intl }) => {
     setShowNewCourseContainer,
     dispatch,
   } = useStudioHome(isPaginationCoursesEnabled);
-
+  const [showNewQuizContainer,setShowNewQuizContainer]=useState(false)
   const {
     userIsActive,
     studioShortName,
@@ -76,6 +76,17 @@ const StudioHome = ({ intl }) => {
           onClick={() => setShowNewCourseContainer(true)}
         >
           {intl.formatMessage(messages.addNewCourseBtnText)}
+        </Button>,
+      );
+      headerButtons.push(
+        <Button
+          variant="outline-primary"
+          iconBefore={AddIcon}
+          size="sm"
+          disabled={showNewQuizContainer}
+          onClick={() => setShowNewQuizContainer(true)}
+        >
+          {intl.formatMessage(messages.addNewQuizBtnText)}
         </Button>,
       );
     }
@@ -135,7 +146,10 @@ const StudioHome = ({ intl }) => {
         <Layout.Element>
           <section>
             {showNewCourseContainer && (
-              <CreateNewCourseForm handleOnClickCancel={() => setShowNewCourseContainer(false)} />
+              <CreateNewCourseForm handleOnClickCancel={() => setShowNewCourseContainer(false)} content_type="Course" />
+            )}
+            {showNewQuizContainer && (
+              <CreateNewCourseForm handleOnClickCancel={() => setShowNewQuizContainer(false)} content_type="Quiz" />
             )}
             {isShowOrganizationDropdown && <OrganizationSection />}
             <TabsSection
