@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Container, Form, Image, useToggle } from '@openedx/paragon';
+import { Button, Container, Form, Image, useToggle, Stack } from '@openedx/paragon';
 import { FormattedMessage, injectIntl, useIntl } from '@edx/frontend-platform/i18n';
 import messages from './messages';
 import { COURSE_BLOCK_NAMES } from '../../constants';
