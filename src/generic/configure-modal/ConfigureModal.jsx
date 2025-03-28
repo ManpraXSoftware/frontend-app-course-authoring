@@ -1,5 +1,5 @@
 /* eslint-disable import/named */
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { useIntl } from '@edx/frontend-platform/i18n';
@@ -21,6 +21,10 @@ import VisibilityTab from './VisibilityTab';
 import AdvancedTab from './AdvancedTab';
 import UnitTab from './UnitTab';
 import CustomTab from './CustomTab'
+import {initialize} from './customTabHelpers'
+import { useDispatch } from 'react-redux';
+import { getConfig } from '@edx/frontend-platform';
+
 const ConfigureModal = ({
   isOpen,
   onClose,
@@ -136,6 +140,19 @@ const ConfigureModal = ({
   const dialogTitle = isXBlockComponent
     ? intl.formatMessage(messages.componentTitle, { title: displayName })
     : intl.formatMessage(messages.title, { title: displayName });
+  const dispatch = useDispatch();
+  const lmsEndpointUrl = getConfig().LMS_BASE_URL;
+  const studioEndpointUrl = getConfig().STUDIO_BASE_URL;
+  const [courseId, setCourseId] = useState("");
+  useEffect(() => {
+    const match = window.location.pathname.match(/course-v1:([^+\/]+)\+([^+\/]+)\+([^+\/]+)/);
+    if (match) {
+      setCourseId(match[0]);
+    }
+  }, []);
+  useEffect(() => {
+    if (courseId) dispatch(initialize({ lmsEndpointUrl, studioEndpointUrl, learningContextId: courseId }));
+  }, [courseId]);
 
   const handleSave = (data) => {
     const groupAccess = {};

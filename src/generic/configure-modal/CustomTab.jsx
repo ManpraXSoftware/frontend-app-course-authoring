@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Container, Form, Image, useToggle, Stack } from '@openedx/paragon';
 import { FormattedMessage, injectIntl, useIntl } from '@edx/frontend-platform/i18n';
 import messages from './messages';
-import { COURSE_BLOCK_NAMES } from '../../constants';
 import SelectImageModal from '@edx/frontend-lib-content-components/dist/editors/sharedComponents/ImageUploadModal/SelectImageModal';
-import { useDispatch, connect } from 'react-redux';
+import { connect } from 'react-redux';
 import * as helpers from './customTabHelpers'
 import { getConfig } from '@edx/frontend-platform';
 import { renderToStaticMarkup } from "react-dom/server";
@@ -24,22 +23,7 @@ const CustomTab = (
   const intl = useIntl();
   const lmsEndpointUrl = getConfig().LMS_BASE_URL;
   const studioEndpointUrl = getConfig().STUDIO_BASE_URL;
-  const dispatch = useDispatch();
-  // const { imageSelectorRef, refReady, setImageSelectorRef } = helpers.prepareImageSelectorRef();
-  const [courseId, setCourseId] = useState("");
 
-  useEffect(() => {
-    const match = window.location.pathname.match(/course-v1:([^+\/]+)\+([^+\/]+)\+([^+\/]+)/);
-
-    if (match) {
-      setCourseId(match[0]);
-    }
-  }, []);
-  useEffect(() => {
-    if (courseId) dispatch(helpers.initialize({ lmsEndpointUrl, studioEndpointUrl, learningContextId: courseId }));
-  }, [dispatch, category, courseId]);
-
-  const visibilityTitle = COURSE_BLOCK_NAMES[category]?.name;
   const [isDisplayImageModalOpen, openSelectImageModal, closeDisplayImageModal] = useToggle(false);
 
   const setDisplayImageModalSelection = (val) => {
