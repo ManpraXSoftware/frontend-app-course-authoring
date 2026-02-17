@@ -1,5 +1,5 @@
 /* eslint-disable import/named */
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { useIntl } from '@edx/frontend-platform/i18n';
@@ -20,6 +20,10 @@ import BasicTab from './BasicTab';
 import VisibilityTab from './VisibilityTab';
 import AdvancedTab from './AdvancedTab';
 import UnitTab from './UnitTab';
+import CustomTab from './CustomTab'
+import {initialize} from './customTabHelpers'
+import { useDispatch } from 'react-redux';
+import { getConfig } from '@edx/frontend-platform';
 
 const ConfigureModal = ({
   isOpen,
@@ -32,6 +36,10 @@ const ConfigureModal = ({
   const intl = useIntl();
   const {
     displayName,
+    // Manprax 
+    progressThreshold,
+    useProgramThreshold, 
+    programUuid,
     start: sectionStartDate,
     visibilityState,
     due,
@@ -98,6 +106,10 @@ const ConfigureModal = ({
     // by default it is -1 i.e. accessible to all learners & staff
     selectedPartitionIndex: userPartitionInfo?.selectedPartitionIndex,
     selectedGroups: getSelectedGroups(),
+    // Manprax 
+    progressThreshold: progressThreshold,
+    useProgramThreshold: useProgramThreshold,
+    programUuid: programUuid,
   };
 
   const validationSchema = Yup.object().shape({
@@ -127,6 +139,43 @@ const ConfigureModal = ({
     ).nullable(true),
     selectedPartitionIndex: Yup.number().integer(),
     selectedGroups: Yup.array().of(Yup.string()),
+
+    // Manprax 
+    useProgramThreshold: Yup.boolean(),
+    programUuid: Yup.string().when('useProgramThreshold', {
+    is: true,
+    then: (schema) =>
+      schema
+        .required(intl.formatMessage({
+          id: 'course-authoring.configure-modal.program-uuid.required',
+          defaultMessage: 'Program UUID is required when using program-wide threshold.',
+        }))
+        .trim()
+        // .matches(
+        //   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+        //   intl.formatMessage({
+        //     id: 'course-authoring.configure-modal.program-uuid.invalid',
+        //     defaultMessage: 'Please enter a valid UUID (e.g. 123e4567-e89b-12d3-a456-426614174000)',
+        //   })
+        // ),
+    // otherwise: (schema) => schema.nullable().default(''),
+  }),
+  progressThreshold: Yup.number()
+    .min(0, intl.formatMessage(messages.minScoreError))
+    .max(100, intl.formatMessage(messages.minScoreError))
+    .when('useProgramThreshold', {
+      is: true,
+      then: (schema) =>
+        schema.required(
+          intl.formatMessage({
+            id: 'course-authoring.configure-modal.progress-threshold.required',
+            defaultMessage: 'Progress threshold is required when using program-wide threshold.',
+          })
+        ),
+      otherwise: (schema) => schema.nullable().default(0),
+    })
+    .integer(intl.formatMessage(messages.thresholdMustBeInteger || { defaultMessage: 'Must be a whole number' })),
+    
   });
 
   const isSubsection = category === COURSE_BLOCK_NAMES.sequential.id;
@@ -134,12 +183,25 @@ const ConfigureModal = ({
   const dialogTitle = isXBlockComponent
     ? intl.formatMessage(messages.componentTitle, { title: displayName })
     : intl.formatMessage(messages.title, { title: displayName });
+  const dispatch = useDispatch();
+  const lmsEndpointUrl = getConfig().LMS_BASE_URL;
+  const studioEndpointUrl = getConfig().STUDIO_BASE_URL;
+  const [courseId, setCourseId] = useState("");
+  useEffect(() => {
+    const match = window.location.pathname.match(/course-v1:([^+\/]+)\+([^+\/]+)\+([^+\/]+)/);
+    if (match) {
+      setCourseId(match[0]);
+    }
+  }, []);
+  useEffect(() => {
+    if (courseId) dispatch(initialize({ lmsEndpointUrl, studioEndpointUrl, learningContextId: courseId }));
+  }, [courseId]);
 
   const handleSave = (data) => {
     const groupAccess = {};
     switch (category) {
     case COURSE_BLOCK_NAMES.chapter.id:
-      onConfigureSubmit(data.isVisibleToStaffOnly, data.releaseDate);
+      onConfigureSubmit(data.isVisibleToStaffOnly, data.releaseDate, data.progressThreshold, data.useProgramThreshold,data.programUuid);
       break;
     case COURSE_BLOCK_NAMES.sequential.id:
       onConfigureSubmit(
@@ -159,9 +221,15 @@ const ConfigureModal = ({
         data.prereqUsageKey,
         data.prereqMinScore,
         data.prereqMinCompletion,
+        // Manprax 
+        data.progressThreshold,
+        data.useProgramThreshold,
+        data.programUuid,
       );
       break;
     case COURSE_BLOCK_NAMES.vertical.id:
+      // onConfigureSubmit(data.isVisibleToStaffOnly, groupAccess, data.progressThreshold);
+      // break;
     case COURSE_BLOCK_NAMES.component.id:
       // groupAccess should be {partitionId: [group1, group2]} or {} if selectedPartitionIndex === -1
       if (data.selectedPartitionIndex >= 0) {
@@ -197,6 +265,13 @@ const ConfigureModal = ({
               showWarning={visibilityState === VisibilityTypes.STAFF_ONLY}
             />
           </Tab>
+          {/* <Tab eventKey="custom" title={intl.formatMessage(messages.customTabTitle)}>
+            <CustomTab
+              values={values}
+              setFieldValue={setFieldValue}
+              category={category}
+            />
+          </Tab> */}
         </Tabs>
       );
     case COURSE_BLOCK_NAMES.sequential.id:
@@ -233,18 +308,44 @@ const ConfigureModal = ({
               onlineProctoringRules={onlineProctoringRules}
             />
           </Tab>
-        </Tabs>
-      );
-    case COURSE_BLOCK_NAMES.vertical.id:
+            <Tab eventKey="custom" title={intl.formatMessage(messages.customTabTitle)}>
+              <CustomTab
+                values={values}
+                setFieldValue={setFieldValue}
+              />
+            </Tab>
+          </Tabs>
+        );
+      case COURSE_BLOCK_NAMES.vertical.id:
+        // <Tabs>
+        //   <Tab eventKey="custom" title={intl.formatMessage(messages.customTabTitle)}>
+        //     <CustomTab
+        //       values={values}
+        //       setFieldValue={setFieldValue}
+        //       category={category}
+        //     />
+        //   </Tab>
+        // </Tabs>
     case COURSE_BLOCK_NAMES.component.id:
-      return (
-        <UnitTab
-          isXBlockComponent={COURSE_BLOCK_NAMES.component.id === category}
-          values={values}
-          setFieldValue={setFieldValue}
-          showWarning={visibilityState === VisibilityTypes.STAFF_ONLY && !ancestorHasStaffLock}
-          userPartitionInfo={userPartitionInfo}
-        />
+        return (
+          <Tabs>
+            <Tab eventKey="unit" title={intl.formatMessage(messages.unitTabTitle)}>
+              <UnitTab
+                isXBlockComponent={COURSE_BLOCK_NAMES.component.id === category}
+                values={values}
+                setFieldValue={setFieldValue}
+                showWarning={visibilityState === VisibilityTypes.STAFF_ONLY && !ancestorHasStaffLock}
+                userPartitionInfo={userPartitionInfo}
+              />
+            </Tab>
+            {/* <Tab eventKey="custom" title={intl.formatMessage(messages.customTabTitle)}>
+              <CustomTab
+                values={values}
+                setFieldValue={setFieldValue}
+                category={category}
+              />
+            </Tab> */}
+          </Tabs>
       );
     default:
       return null;
@@ -342,10 +443,16 @@ ConfigureModal.propTypes = {
     }),
     ancestorHasStaffLock: PropTypes.bool,
     isPrereq: PropTypes.bool,
-    prereqs: PropTypes.arrayOf({
-      blockDisplayName: PropTypes.string,
-      blockUsageKey: PropTypes.string,
-    }),
+    prereqs: PropTypes.arrayOf(
+    //   {
+    //   blockDisplayName: PropTypes.string,
+    //   blockUsageKey: PropTypes.string,
+    // }
+    PropTypes.shape({
+    blockDisplayName: PropTypes.string,
+    blockUsageKey: PropTypes.string,
+  })
+  ),
     prereq: PropTypes.number,
     prereqMinScore: PropTypes.number,
     prereqMinCompletion: PropTypes.number,
@@ -357,7 +464,8 @@ ConfigureModal.propTypes = {
     examReviewRules: PropTypes.string,
     supportsOnboarding: PropTypes.bool,
     showReviewRules: PropTypes.bool,
-    onlineProctoringRules: PropTypes.string,
+    onlineProctoringRules: PropTypes.string
+
   }).isRequired,
   isXBlockComponent: PropTypes.bool,
 };

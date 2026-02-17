@@ -275,6 +275,72 @@ const messages = defineMessages({
     id: 'course-authoring.course-outline.configure-modal.advanced-tab.reviewRulesDescriptionLinkText',
     defaultMessage: 'general proctored exam rules',
   },
+
+  // Manprax
+  unitTabTitle: {
+    id: 'course-authoring.course-outline.configure-modal.unit-tab.title',
+    defaultMessage: 'Unit',
+  },
+  customTabTitle: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.title',
+    defaultMessage: 'Custom',
+  },
+  // customSectionTitle: {
+  //   id: 'course-authoring.course-outline.configure-modal.custom-section.title',
+  //   defaultMessage: 'Custom Configurations',
+  // },
+  displayImageLabel: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.displayImageLabel',
+    defaultMessage: 'Display Image',
+  },
+  displayImageDescription: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.displayImageDescription',
+    defaultMessage: 'Display Image for this course block.',
+  },
+  noDisplayImageSelectedMessage: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.noDisplayImageSelectedMessage',
+    defaultMessage: 'No Display Image Selected',
+  },
+  pickDisplayImageButton: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.button.pickImage',
+    defaultMessage: 'Pick Image',
+  },
+  clearDisplayImageButton: {
+    id: 'course-authoring.course-outline.configure-modal.custom-tab.button.clear',
+    defaultMessage: 'Clear Image',
+  },
+
+
+  customSectionTitle: { id: 'custom.tab.title', defaultMessage: 'Custom Configurations' }, // Or 'Progress Settings'
+  progressThresholdLabel: { id: 'custom.progress.threshold.label', defaultMessage: 'Progress Threshold (%)' },
+  progressThresholdDescription: { id: 'custom.progress.threshold.description', defaultMessage: 'Set a minimum course progress percentage (0-100) required to unlock this subsection. If set to 0 or left blank, the subsection is always accessible (subject to other visibility rules). Example: 50 means learners must complete 50% of the course before viewing this subsection.' },
+  useProgramThresholdLabel: { id: 'custom.use.program.threshold.label', defaultMessage: 'Use program-wide progress threshold' },
+  useProgramThresholdDescription: { id: 'custom.use.program.threshold.description', defaultMessage: 'Enable this to unlock the subsection based on aggregated progress across all courses in a specific program, instead of just this course.' },
+  programUuidLabel: { id: 'custom.program.uuid.label', defaultMessage: 'Program UUID' },
+  programUuidDescription: { id: 'custom.program.uuid.description', defaultMessage: 'Enter the UUID of the program (e.g., "01c8ea70-ef80-43b3-a683-ed3d5cb35da3"). All courses linked to this program must reach the threshold progress for unlocking.' },
+  programThresholdDescription: { id: 'custom.program.threshold.description', defaultMessage: 'Set the minimum aggregated progress percentage (0-100) across all program courses. Example: 60 means each courses in the program must be at least 60% complete.' },
+  customProgramUuidRequired: { id: 'custom.program.uuid.required', defaultMessage: 'Program UUID is required when using program-wide threshold.' },
+  customThresholdRangeError: { id: 'custom.threshold.range.error', defaultMessage: 'Threshold must be between 0 and 100.' },
+  'course-authoring.configure-modal.program-uuid.required': {
+    id: 'course-authoring.configure-modal.program-uuid.required',
+    defaultMessage: 'Program UUID is required when using program-wide threshold.',
+    description: 'Error when program threshold mode is on but UUID is empty',
+  },
+  'course-authoring.configure-modal.program-uuid.invalid': {
+    id: 'course-authoring.configure-modal.program-uuid.invalid',
+    defaultMessage: 'Please enter a valid UUID format',
+    description: 'Invalid UUID format',
+  },
+  'course-authoring.configure-modal.progress-threshold.required': {
+    id: 'course-authoring.configure-modal.progress-threshold.required',
+    defaultMessage: 'Progress threshold is required when using program-wide threshold.',
+    description: 'Error when program mode is on but threshold is empty',
+  },
+  thresholdMustBeInteger: {
+    id: 'course-authoring.configure-modal.threshold-integer',
+    defaultMessage: 'Must be a whole number',
+  },
+  
 });
 
 export default messages;

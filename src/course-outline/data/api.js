@@ -222,9 +222,12 @@ export async function publishCourseSection(sectionId) {
  * @param {string} sectionId
  * @param {boolean} isVisibleToStaffOnly
  * @param {string} startDatetime
+ * @param {string} progressThreshold
+ * @param {boolean} useProgramThreshold
+ * @param {string} programUuid
  * @returns {Promise<Object>}
  */
-export async function configureCourseSection(sectionId, isVisibleToStaffOnly, startDatetime) {
+export async function configureCourseSection(sectionId, isVisibleToStaffOnly, startDatetime, progressThreshold, useProgramThreshold, programUuid) {
   const { data } = await getAuthenticatedHttpClient()
     .post(getCourseItemApiUrl(sectionId), {
       publish: 'republish',
@@ -232,6 +235,11 @@ export async function configureCourseSection(sectionId, isVisibleToStaffOnly, st
         // The backend expects metadata.visible_to_staff_only to either true or null
         visible_to_staff_only: isVisibleToStaffOnly ? true : null,
         start: startDatetime,
+        // Manprax 
+        progress_threshold: progressThreshold,
+        use_program_threshold: useProgramThreshold,
+        program_uuid: programUuid,
+
       },
     });
 
@@ -257,6 +265,9 @@ export async function configureCourseSection(sectionId, isVisibleToStaffOnly, st
  * @param {string} prereqUsageKey,
  * @param {number} prereqMinScore,
  * @param {number} prereqMinCompletion,
+ * @param {string} progressThreshold,
+ * @param {boolean} useProgramThreshold,
+ * @param {string} programUuid,
  * @returns {Promise<Object>}
  */
 export async function configureCourseSubsection(
@@ -277,6 +288,11 @@ export async function configureCourseSubsection(
   prereqUsageKey,
   prereqMinScore,
   prereqMinCompletion,
+  // Manprax
+  progressThreshold,
+  useProgramThreshold,
+  programUuid
+
 ) {
   const { data } = await getAuthenticatedHttpClient()
     .post(getCourseItemApiUrl(itemId), {
@@ -299,6 +315,11 @@ export async function configureCourseSubsection(
         default_time_limit_minutes: defaultTimeLimitMin,
         is_onboarding_exam: isOnboardingExam,
         start: releaseDate,
+        // Manprax 
+        progress_threshold: progressThreshold,
+        use_program_threshold: useProgramThreshold,
+        program_uuid: programUuid,
+
       },
     });
   return data;
@@ -309,9 +330,12 @@ export async function configureCourseSubsection(
  * @param {string} unitId
  * @param {boolean} isVisibleToStaffOnly
  * @param {object} groupAccess
+ * @param {string} progressThreshold
+ * @param {boolean} useProgramThreshold
+ * @param {string} programUuid
  * @returns {Promise<Object>}
  */
-export async function configureCourseUnit(unitId, isVisibleToStaffOnly, groupAccess) {
+export async function configureCourseUnit(unitId, isVisibleToStaffOnly, groupAccess, progressThreshold, useProgramThreshold, programUuid) {
   const { data } = await getAuthenticatedHttpClient()
     .post(getCourseItemApiUrl(unitId), {
       publish: 'republish',
@@ -319,6 +343,11 @@ export async function configureCourseUnit(unitId, isVisibleToStaffOnly, groupAcc
         // The backend expects metadata.visible_to_staff_only to either true or null
         visible_to_staff_only: isVisibleToStaffOnly ? true : null,
         group_access: groupAccess,
+        // Manprax 
+        progress_threshold: progressThreshold,
+        use_program_threshold: useProgramThreshold,
+        program_uuid: programUuid,
+
       },
     });
 

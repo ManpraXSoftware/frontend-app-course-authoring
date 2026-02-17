@@ -278,12 +278,12 @@ export function configureCourseItemQuery(sectionId, configureFn) {
     }
   };
 }
-
-export function configureCourseSectionQuery(sectionId, isVisibleToStaffOnly, startDatetime) {
+// Manprax 
+export function configureCourseSectionQuery(sectionId, isVisibleToStaffOnly, startDatetime, progressThreshold, useProgramThreshold, programUuid) {
   return async (dispatch) => {
     dispatch(configureCourseItemQuery(
       sectionId,
-      async () => configureCourseSection(sectionId, isVisibleToStaffOnly, startDatetime),
+      async () => configureCourseSection(sectionId, isVisibleToStaffOnly, startDatetime, progressThreshold, useProgramThreshold, programUuid),
     ));
   };
 }
@@ -307,6 +307,10 @@ export function configureCourseSubsectionQuery(
   prereqUsageKey,
   prereqMinScore,
   prereqMinCompletion,
+  // Manprax 
+  progressThreshold,
+  useProgramThreshold,
+  programUuid
 ) {
   return async (dispatch) => {
     dispatch(configureCourseItemQuery(
@@ -329,16 +333,20 @@ export function configureCourseSubsectionQuery(
         prereqUsageKey,
         prereqMinScore,
         prereqMinCompletion,
+        // Manprax 
+        progressThreshold,
+        useProgramThreshold, 
+        programUuid
       ),
     ));
   };
 }
-
-export function configureCourseUnitQuery(itemId, sectionId, isVisibleToStaffOnly, groupAccess) {
+// Manprax 
+export function configureCourseUnitQuery(itemId, sectionId, isVisibleToStaffOnly, groupAccess, progressThreshold, useProgramThreshold, programUuid) {
   return async (dispatch) => {
     dispatch(configureCourseItemQuery(
       sectionId,
-      async () => configureCourseUnit(itemId, isVisibleToStaffOnly, groupAccess),
+      async () => configureCourseUnit(itemId, isVisibleToStaffOnly, groupAccess, progressThreshold, useProgramThreshold, programUuid),
     ));
   };
 }

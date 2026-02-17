@@ -7,6 +7,7 @@ import GradingPolicyAlert from './GradingPolicyAlert';
 import GradingTypeAndDueDate from './GradingTypeAndDueDate';
 import StatusMessages from './StatusMessages';
 import HideAfterDueMessage from './HideAfterDueMessage';
+import MXProgressThreshold from './MXProgressThreshold';
 
 const XBlockStatus = ({
   isSelfPaced,
@@ -33,11 +34,17 @@ const XBlockStatus = ({
     graded,
     courseGraders,
     hideAfterDue,
+
+    // Manprax 
+    progressThreshold,
+    useProgramThreshold
   } = blockData;
 
   const isInstructorPaced = !isSelfPaced;
   const isVertical = category === COURSE_BLOCK_NAMES.vertical.id;
 
+
+  
   return (
     <div className="text-secondary-400 x-small mb-1">
       {!isVertical && (
@@ -62,7 +69,11 @@ const XBlockStatus = ({
           dueDate={dueDate}
           relativeWeeksDue={relativeWeeksDue}
         />
+        
       )}
+
+       {/* Manprax  */}
+        <MXProgressThreshold progressThreshold={progressThreshold} useProgramThreshold={useProgramThreshold} />
       {hideAfterDue && (
         <HideAfterDueMessage isSelfPaced={isSelfPaced} />
       )}
@@ -116,6 +127,10 @@ XBlockStatus.propTypes = {
     graded: PropTypes.bool,
     courseGraders: PropTypes.arrayOf(PropTypes.string.isRequired),
     hideAfterDue: PropTypes.bool,
+    // Manprax 
+    isProgressThreshold: PropTypes.string,
+    useProgramThreshold:PropTypes.bool,
+
   }).isRequired,
 };
 
