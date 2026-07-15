@@ -59,7 +59,7 @@ const messages = defineMessages({
   },
   courseNumberRerunHelpText: {
     id: 'course-authoring.create-or-rerun-course.rerun.number.help-text',
-    defaultMessage: 'The unique number that identifies the new course within the organization. (This number will be the same as the original course number and cannot be changed.)',
+    defaultMessage: 'The unique number that identifies the new course within the organization. (This must be different from the original course number.)',
   },
   courseNotePartCourseURLRequireStrong: {
     id: 'course-authoring.create-or-rerun-course.number.help-text.strong',

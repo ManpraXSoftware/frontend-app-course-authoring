@@ -84,7 +84,9 @@ const CreateOrRerunCourseForm = ({
         }),
       name: 'org',
       value: values.org,
-      options: organizations,
+      // Manprax 
+      // options: organizations,
+      options: Array.from(new Set(organizations)),
       placeholder: intl.formatMessage(messages.courseOrgPlaceholder),
       disabled: false,
     },
@@ -102,7 +104,7 @@ const CreateOrRerunCourseForm = ({
       name: 'number',
       value: values.number,
       placeholder: intl.formatMessage(messages.courseNumberPlaceholder),
-      disabled: !isCreateNewCourse,
+      disabled: false,
     },
     {
       label: intl.formatMessage(messages.courseRunLabel),
